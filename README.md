@@ -4,6 +4,18 @@ Scripts for preserving and modernizing the 1996 Provo Craft electronic clip-art 
 
 This repository contains **scripts only**. It does not include disc images, clip art, fonts, or other recovered assets. The MIT License applies only to this repository's scripts and documentation; all extracted CD content remains subject to its original copyright and license terms. See [CONTENT_RIGHTS.md](CONTENT_RIGHTS.md).
 
+## Original system requirements, circa 1996
+
+The discs asked for what was then a serious workstation:
+
+| Platform | Original requirements |
+| --- | --- |
+| Windows | Windows 3.1 or later with TrueType support, **4 MB RAM**, **48 MB hard-disk space**, and a graphics program that supports TIFF |
+| Macintosh | System 6 or later (System 7 recommended), **4–8 MB disk space**, **4–8 MB RAM**, and a graphics program that supports TIFF or EPS |
+
+In other words: this project turns media designed for a computer with less memory than a modern browser tab into files useful on a current Mac. The recovery scripts keep the original formats intact while producing GIF, SVG, modern TTF, and thumbnail contact-sheet derivatives.
+
+
 ## What it does
 
 `scripts/recover_cd.py` supports two steps:
@@ -16,7 +28,7 @@ This repository contains **scripts only**. It does not include disc images, clip
    ├── contact-sheet-01.png
    ├── contact-sheet-02.png
    ├── ...
-   ├── All Occasions Normal.ttf   # when a Macintosh .suit is present
+   ├── <font name>.ttf            # when a Macintosh .suit is present
    ├── GIF/
    ├── SVG/
    ├── manifest.json
@@ -34,6 +46,14 @@ The scripts target macOS and require:
 - pstoedit (`pstoedit`)
 - FontForge (`fontforge`)
 
+Install them in one step with Homebrew:
+
+```bash
+./scripts/setup_macos.sh
+```
+
+The script uses the checked-in `Brewfile`, so it is safe to re-run.
+
 For a classic Macintosh HFS disc, extract the source folders first with an HFS-aware tool such as `hfsutils`. Preserve legacy fonts in MacBinary form so both forks survive.
 
 ## Build a modern asset folder
@@ -47,7 +67,7 @@ python3 scripts/recover_cd.py build \
   --disc-name "All Occasions"
 ```
 
-Use `--overwrite` only when you intend to replace an existing generated per-disc folder.
+The converter derives each output TTF filename from its `.suit` source. Use `--font-name "Custom Name"` only to override that name. Use `--overwrite` only when you intend to replace an existing generated per-disc folder.
 
 ## Preserve a raw optical-disc image
 

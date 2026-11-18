@@ -6,7 +6,7 @@ TIFF/, EPS/, and optionally FONT (original Mac files)/*.suit.bin. It creates:
 
 <output>/<disc-slug>/
   contact-sheet-01.png ...
-  All Occasions Normal.ttf       (when a .suit font is present)
+  <font name>.ttf                (when a .suit font is present)
   GIF/
   SVG/
   manifest.json
@@ -33,10 +33,12 @@ class OutputLayout:
     root: Path
     gif_dir: Path
     svg_dir: Path
-    ttf: Path
 
     def contact_sheet(self, number: int) -> Path:
         return self.root / f"contact-sheet-{number:02d}.png"
+
+    def font_path(self, font_name: str) -> Path:
+        return self.root / f"{font_name}.ttf"
 
 
 def slugify(value: str) -> str:
@@ -45,9 +47,9 @@ def slugify(value: str) -> str:
     return value.strip("-") or "untitled-cd"
 
 
-def output_layout(destination: Path, disc_name: str, font_name: str = "All Occasions Normal") -> OutputLayout:
+def output_layout(destination: Path, disc_name: str) -> OutputLayout:
     root = destination / slugify(disc_name)
-    return OutputLayout(root=root, gif_dir=root / "GIF", svg_dir=root / "SVG", ttf=root / f"{font_name}.ttf")
+    return OutputLayout(root=root, gif_dir=root / "GIF", svg_dir=root / "SVG")
 
 
 def run(command: list[str]) -> None:
@@ -100,12 +102,23 @@ def find_suitcase(source_root: Path) -> Path | None:
     return candidates[0] if candidates else None
 
 
-def convert_suitcase(source_root: Path, layout: OutputLayout, font_name: str) -> dict[str, str] | None:
+def font_name_from_suitcase(suitcase: Path) -> str:
+    name = suitcase.name
+    for suffix in (".suit.bin", ".suit"):
+        if name.lower().endswith(suffix):
+            name = name[: -len(suffix)]
+            break
+    return re.sub(r"[-_]+", " ", name).strip() or "Recovered Font"
+
+
+def convert_suitcase(source_root: Path, layout: OutputLayout, font_name: str | None) -> dict[str, str] | None:
     suitcase = find_suitcase(source_root)
     if suitcase is None:
         return None
     require_tool("fontforge")
-    postscript_name = re.sub(r"[^A-Za-z0-9]", "", font_name) or "RecoveredFont"
+    resolved_name = font_name or font_name_from_suitcase(suitcase)
+    target = layout.font_path(resolved_name)
+    postscript_name = re.sub(r"[^A-Za-z0-9]", "", resolved_name) or "RecoveredFont"
     code = (
         "import fontforge,sys; "
         "f=fontforge.open(sys.argv[1]); "
@@ -113,8 +126,8 @@ def convert_suitcase(source_root: Path, layout: OutputLayout, font_name: str) ->
         "f.version='Converted from the original Macintosh .suit resource'; "
         "f.generate(sys.argv[2],flags=('dummy-dsig',))"
     )
-    run(["fontforge", "-lang=py", "-c", code, str(suitcase), str(layout.ttf), postscript_name, font_name])
-    return {"source": str(suitcase.relative_to(source_root)), "output": str(layout.ttf.relative_to(layout.root))}
+    run(["fontforge", "-lang=py", "-c", code, str(suitcase), str(target), postscript_name, resolved_name])
+    return {"source": str(suitcase.relative_to(source_root)), "output": str(target.relative_to(layout.root))}
 
 
 def create_contact_sheets(layout: OutputLayout, columns: int = 8, rows: int = 8) -> list[str]:
@@ -148,10 +161,10 @@ def create_contact_sheets(layout: OutputLayout, columns: int = 8, rows: int = 8)
     return names
 
 
-def build(source: Path, destination: Path, disc_name: str, font_name: str, overwrite: bool) -> OutputLayout:
+def build(source: Path, destination: Path, disc_name: str, font_name: str | None, overwrite: bool) -> OutputLayout:
     if not source.is_dir():
         raise RuntimeError(f"Source directory does not exist: {source}")
-    layout = output_layout(destination, disc_name, font_name)
+    layout = output_layout(destination, disc_name)
     if layout.root.exists() and not overwrite:
         raise RuntimeError(f"Output already exists: {layout.root} (use --overwrite to replace it)")
     if layout.root.exists():
@@ -202,7 +215,7 @@ def main() -> int:
     build_parser.add_argument("source", type=Path, help="extracted CD folder containing TIFF/, EPS/, and optional FONT folders")
     build_parser.add_argument("destination", type=Path, help="parent folder for the generated per-CD folder")
     build_parser.add_argument("--disc-name", required=True)
-    build_parser.add_argument("--font-name", default="All Occasions Normal")
+    build_parser.add_argument("--font-name", help="optional display name override for a converted .suit font")
     build_parser.add_argument("--overwrite", action="store_true")
     archive_parser = subparsers.add_parser("archive", help="make a raw Mode-1 CD archive and derived ISO")
     archive_parser.add_argument("device", type=Path, help="raw device, e.g. /dev/rdisk12")

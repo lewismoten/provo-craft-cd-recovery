@@ -15,7 +15,7 @@ class OutputLayoutTests(unittest.TestCase):
         self.assertEqual(layout.root, Path("/archive/all-occasions"))
         self.assertEqual(layout.gif_dir, layout.root / "GIF")
         self.assertEqual(layout.svg_dir, layout.root / "SVG")
-        self.assertEqual(layout.ttf, layout.root / "All Occasions Normal.ttf")
+        self.assertEqual(layout.font_path("Birthday Fun"), layout.root / "Birthday Fun.ttf")
         self.assertEqual(layout.contact_sheet(1), layout.root / "contact-sheet-01.png")
 
     def test_slugify_normalizes_disc_names(self):
