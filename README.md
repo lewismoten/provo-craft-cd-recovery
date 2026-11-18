@@ -6,6 +6,14 @@ This repository contains **scripts only**. It does not include disc images, clip
 
 ![Illustration of the Provo Craft CD recovery workflow: CD-ROM to archive, PNG, SVG, and TTF](assets/provo-craft-cd-recovery-banner.png)
 
+## Recover an inserted disc
+
+```bash
+python3 scripts/recover_cd.py recover
+```
+
+It detects the inserted CD-ROM drive, reads the classic-Mac HFS volume name, and writes the full result to `CD/<detected-disc-name>/`. Every major step and conversion batch is printed as it runs; raw capture also exposes `dd` progress while the CD spins. That Git-ignored folder includes the raw archive in `archive/`, root-level contact sheets and converted TTF fonts, plus `PNG/` and `SVG/` directories. Re-running it fingerprints the inserted disc, finds any matching local archive, and skips archive, image, font, SVG, and contact-sheet files that already exist.
+
 ## Original system requirements, circa 1996
 
 The discs asked for what was then a serious workstation:
@@ -28,7 +36,7 @@ The manuals were frank that these CDs were **not easily DOS-compatible**. Their 
 
 The manuals named a period software shelf that included QuarkXPress, WordPerfect 5.0+, Microsoft Word 5.0+, ClarisWorks, CorelDRAW! 4.0+, Draw 4.0, Aldus PhotoStyler, Adobe Photoshop, Adobe Illustrator 3.0, Microsoft Works 4.0, Aldus PageMaker 4.0+, Print Artist 3.0+, The Print Shop Deluxe/II/III, and Adobe PhotoDeluxe.
 
-This project leans into that history while widening compatibility for current software: TIFF artwork becomes compressed 1-bit PNG files, EPS becomes standalone SVG, readable Macintosh `.suit` resources become modern TTFs, and contact sheets make the recovered collection browsable without booting Windows 3.1 or System 7.
+This project leans into that history while widening compatibility for current software: TIFF artwork becomes compressed 1-bit PNG files, EPS becomes standalone SVG, readable Macintosh `.suit` resources become modern TTFs, and contact sheets make the recovered collection browsable without flipping through the manuals' dead trees.
 
 ## Acquisition story
 
@@ -56,14 +64,6 @@ The recovery set began with seven Provo Craft boxes found at an annual library b
    ```
 
 The root contact sheets use labeled 8×8 thumbnail grids. Labels show the source category folder and filename without the extension.
-
-For normal use, run the complete workflow instead:
-
-```bash
-python3 scripts/recover_cd.py recover
-```
-
-It detects the inserted CD-ROM drive, reads the classic-Mac HFS volume name, then writes the full result to `CD/<detected-disc-name>/`. Every major step and conversion batch is printed as it runs; raw capture also exposes `dd` progress while the CD spins. That folder is Git-ignored and includes the raw archive in `archive/`, root-level contact sheets and converted TTF fonts, plus `PNG/` and `SVG/` directories. Re-running it fingerprints the inserted disc, finds any matching local archive, and skips archive, image, font, SVG, and contact-sheet files that already exist.
 
 ## Requirements
 
