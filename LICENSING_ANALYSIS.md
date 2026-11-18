@@ -30,6 +30,8 @@ That is a very different model from posting a reusable digital asset online. The
 
 The license assumes a simple setup: one person puts the CD in one computer, keeps the files on that computer, and does not send them to anyone else. That was a realistic way to use clip art in 1996.
 
+The network clause was probably aimed first at the places where one purchased CD could serve the most people: school computer labs, libraries, offices, and larger businesses. Requiring a disc for every person who could reach a network installation reads like a seat-license rule designed to stop a single copy from supplying many workstations. The wording is broad enough that it also creates awkward questions for a modern home network.
+
 A present-day household is different. Wi-Fi, cloud backup, synchronized folders, shared storage, remote access, and several personal devices are ordinary. A strict reading of the license makes routine conveniences awkward if they put recovered files where more than one person could reach them.
 
 Examples that deserve caution under the manual's wording include:
