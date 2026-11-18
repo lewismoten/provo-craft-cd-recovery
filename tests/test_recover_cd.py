@@ -45,6 +45,20 @@ class OutputLayoutTests(unittest.TestCase):
             recover_cd.announce('Extracting TIFF files')
         self.assertEqual(stream.getvalue(), 'Extracting TIFF files\n')
 
+    def test_eject_optical_disc_uses_the_detected_non_raw_device(self):
+        commands: list[list[str]] = []
+        original_run = recover_cd.run
+        recover_cd.run = commands.append
+        try:
+            stream = io.StringIO()
+            with redirect_stdout(stream):
+                recover_cd.eject_optical_disc(Path('/dev/rdisk12'))
+        finally:
+            recover_cd.run = original_run
+
+        self.assertEqual(commands, [['diskutil', 'eject', '/dev/disk12']])
+        self.assertEqual(stream.getvalue(), 'Ejecting CD: /dev/disk12\n')
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -12,7 +12,7 @@ This repository contains **scripts only**. It does not include disc images, clip
 python3 scripts/recover_cd.py recover
 ```
 
-It detects the inserted CD-ROM drive, reads the classic-Mac HFS volume name, and writes the full result to `CD/<detected-disc-name>/`. Every major step and conversion batch is printed as it runs; raw capture also exposes `dd` progress while the CD spins. That Git-ignored folder includes the raw archive in `archive/`, root-level contact sheets and converted TTF fonts, plus `PNG/` and `SVG/` directories. Re-running it fingerprints the inserted disc, finds any matching local archive, and skips archive, image, font, SVG, and contact-sheet files that already exist.
+It detects the inserted CD-ROM drive, reads the classic-Mac HFS volume name, and writes the full result to `CD/<detected-disc-name>/`. Every major step and conversion batch is printed as it runs; raw capture also exposes `dd` progress while the CD spins. After a successful recovery, it ejects the disc. That Git-ignored folder includes the raw archive in `archive/`, root-level contact sheets and converted TTF fonts, plus `PNG/` and `SVG/` directories. Re-running it fingerprints the inserted disc, finds any matching local archive, and skips archive, image, font, SVG, and contact-sheet files that already exist.
 
 ## Original system requirements, circa 1996
 

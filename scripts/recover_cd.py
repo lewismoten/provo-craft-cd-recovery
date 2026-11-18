@@ -99,6 +99,15 @@ def detect_optical_device() -> Path:
     return optical_device_from_drutil_status(result.stdout)
 
 
+def eject_optical_disc(device: Path) -> None:
+    """Eject the physical disc after a successful recovery."""
+    require_tool("diskutil")
+    disk_name = device.name[1:] if device.name.startswith("r") else device.name
+    disk = Path("/dev") / disk_name
+    announce(f"Ejecting CD: {disk}")
+    run(["diskutil", "eject", str(disk)])
+
+
 def volume_name_from_hmount_output(output: str) -> str:
     match = re.search(r'Volume name is "(.+?)"', output)
     if not match:
@@ -393,16 +402,15 @@ def recover_current_cd(destination: Path, overwrite: bool, device: Path | None =
             announce("Detaching the read-only ISO")
             run(["hdiutil", "detach", str(whole_disk)])
         layout = build(extracted, destination, disc_name, None, overwrite)
-        if existing_archive:
-            announce(f"Recovery complete: {layout.root}")
-            return layout
-        archive_dir = layout.root / "archive"
-        archive_dir.mkdir(parents=True, exist_ok=True)
-        base = slugify(disc_name)
-        shutil.move(str(raw_capture), archive_dir / f"{base}.cdr")
-        shutil.move(str(iso), archive_dir / f"{base}.iso")
-        shutil.move(str(raw_capture.with_suffix(raw_capture.suffix + ".sha256")), archive_dir / f"{base}.cdr.sha256")
+        if not existing_archive:
+            archive_dir = layout.root / "archive"
+            archive_dir.mkdir(parents=True, exist_ok=True)
+            base = slugify(disc_name)
+            shutil.move(str(raw_capture), archive_dir / f"{base}.cdr")
+            shutil.move(str(iso), archive_dir / f"{base}.iso")
+            shutil.move(str(raw_capture.with_suffix(raw_capture.suffix + ".sha256")), archive_dir / f"{base}.cdr.sha256")
         announce(f"Recovery complete: {layout.root}")
+        eject_optical_disc(device)
         return layout
 
 
