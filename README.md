@@ -6,7 +6,7 @@ Every title documented here so far is marked **copyright August 1996**. The shar
 
 This repository contains **scripts only**. It does not include disc images, clip art, fonts, or other recovered assets. The MIT License applies only to this repository's scripts and documentation; all extracted CD content remains subject to its original copyright and license terms. See [CONTENT_RIGHTS.md](CONTENT_RIGHTS.md).
 
-![Illustration of the Provo Craft CD recovery workflow: CD-ROM to archive, PNG, SVG, and TTF](assets/provo-craft-cd-recovery-banner.png)
+![Illustration of the Provo Craft CD recovery workflow: CD-ROM to archive, PNG, SVG, and TTF](assets/provo-craft-cd-recovery-banner.jpg)
 
 ## Recover an inserted disc
 
