@@ -55,23 +55,25 @@ The recovery set began with seven Provo Craft boxes found at an annual library b
 
 ## Disc credits noted on the packaging
 
-- **Rebecca's Winter Weather** — Rebecca Carter; copyright August 1996; product no. 40-6068.
-- **Rebecca's Garden Party** — Rebecca Carter; copyright August 1996; product no. 40-6069.
-- **Countryside Collection** — Kathy Distefano Griffiths; copyright August 1996; product no. 40-6070.
-- **Four Seasons** — Kathy Distefano Griffiths; copyright August 1996; product no. 40-6071.
-- **Creations On Computer: All Occasions** — Annette Ward; copyright August 1996; product no. 40-6072.
-- **Holidays** — Annette Ward; copyright August 1996; product no. 40-6073.
+The packaging for every recovered disc lists copyright **August 1996**.
+
+- **Rebecca's Winter Weather** — Rebecca Carter; product no. 40-6068.
+- **Rebecca's Garden Party** — Rebecca Carter; product no. 40-6069.
+- **Countryside Collection** — Kathy Distefano Griffiths; product no. 40-6070.
+- **Four Seasons** — Kathy Distefano Griffiths; product no. 40-6071.
+- **Creations On Computer: All Occasions** — Annette Ward; product no. 40-6072.
+- **Holidays** — Annette Ward; product no. 40-6073.
 
 ## Recovered CDs
 
-| Disc | Product no. | Output folder | Credited creator | Copyright | PNG | SVG | Font |
-| --- | --- | --- | --- | --- | ---: | ---: | --- |
-| Rebecca's Winter Weather | 40-6068 | `winter-weather` | Rebecca Carter | August 1996 | 216 | 216 | `Winter Weather Normal.ttf` |
-| Rebecca's Garden Party | 40-6069 | `garden-party` | Rebecca Carter | August 1996 | 217 | 217 | `Garden Party Normal.ttf` |
-| Countryside Collection | 40-6070 | `countryside` | Kathy Distefano Griffiths | August 1996 | 215 | 215 | `Countryside Normal.ttf` |
-| Four Seasons | 40-6071 | `four-seasons` | Kathy Distefano Griffiths | August 1996 | 221 | 221 | `Four Seasons Normal.ttf` |
-| Creations On Computer: All Occasions | 40-6072 | `all-occasions` | Annette Ward | August 1996 | 202 | 202 | `ALL OCCASIONS Normal.ttf` |
-| Holidays | 40-6073 | `holidays` | Annette Ward | August 1996 | 199 | 198 | `Holidays Normal.ttf` |
+| Disc | Product no. | Output folder | Credited creator | PNG | SVG | Font |
+| --- | --- | --- | --- | ---: | ---: | --- |
+| Rebecca's Winter Weather | 40-6068 | `winter-weather` | Rebecca Carter | 216 | 216 | `Winter Weather Normal.ttf` |
+| Rebecca's Garden Party | 40-6069 | `garden-party` | Rebecca Carter | 217 | 217 | `Garden Party Normal.ttf` |
+| Countryside Collection | 40-6070 | `countryside` | Kathy Distefano Griffiths | 215 | 215 | `Countryside Normal.ttf` |
+| Four Seasons | 40-6071 | `four-seasons` | Kathy Distefano Griffiths | 221 | 221 | `Four Seasons Normal.ttf` |
+| Creations On Computer: All Occasions | 40-6072 | `all-occasions` | Annette Ward | 202 | 202 | `ALL OCCASIONS Normal.ttf` |
+| Holidays | 40-6073 | `holidays` | Annette Ward | 199 | 198 | `Holidays Normal.ttf` |
 
 The following are **third-party Internet Archive listings**, included as historical discovery references only. They are not supplied or endorsed by this repository, and their availability does not grant permission to redistribute the original artwork, fonts, manuals, or disc images.
 
