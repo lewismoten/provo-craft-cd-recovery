@@ -15,6 +15,24 @@ The discs asked for what was then a serious workstation:
 
 In other words: this project turns media designed for a computer with less memory than a modern browser tab into files useful on a current Mac. The recovery scripts keep the original formats intact while producing GIF, SVG, modern TTF, and thumbnail contact-sheet derivatives.
 
+## Compatibility notes from the manuals
+
+The manuals were frank that these CDs were **not easily DOS-compatible**. Their format choices were deliberately practical for the 1990s:
+
+- **Streamlined EPS** was presented as a Macintosh-only feature. It was recommended because artwork could be redrawn whenever it was changed.
+- **TIFF** was the fairly universal option: designed to be straightforward to use in graphics and drawing programs.
+- Some discs included grayscale TIFFs as a bonus for people with enough memory to work with them.
+- One insert warned that PrintShop could import only 256-color TIFFs. It listed The Print Shop Ensemble, Ensemble II, Ensemble III, and The Print Shop Deluxe II as unable to accept those images; older editions of The Print Shop Deluxe, limited to 16-color TIFFs, could import the graphics.
+
+The manuals named a period software shelf that included QuarkXPress, WordPerfect 5.0+, Microsoft Word 5.0+, ClarisWorks, CorelDRAW! 4.0+, Draw 4.0, Aldus PhotoStyler, Adobe Photoshop, Adobe Illustrator 3.0, Microsoft Works 4.0, Aldus PageMaker 4.0+, Print Artist 3.0+, The Print Shop Deluxe/II/III, and Adobe PhotoDeluxe.
+
+This project leans into that history while widening compatibility for current software: TIFF artwork becomes compact GIF files, EPS becomes standalone SVG, readable Macintosh `.suit` resources become modern TTFs, and contact sheets make the recovered collection browsable without booting Windows 3.1 or System 7.
+
+## Acquisition story
+
+The recovery set began with seven Provo Craft boxes found at an annual library book sale on the final **Name Your Price Day**. The lot cost $5, supporting the library; that same five dollars also covered *Spinal Tap: Break Like the Wind*, an Ear Food album originally marked $6.99 and later stickered at $0.50. Its eventual export will, appropriately, go to 11.
+
+
 
 ## What it does
 
