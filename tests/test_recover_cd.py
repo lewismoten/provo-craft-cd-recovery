@@ -21,6 +21,14 @@ class OutputLayoutTests(unittest.TestCase):
     def test_slugify_normalizes_disc_names(self):
         self.assertEqual(recover_cd.slugify('Provo Craft: All Occasions!'), 'provo-craft-all-occasions')
 
+    def test_optical_device_from_drutil_status_prefers_raw_device(self):
+        status = """Vendor   Product           Rev
+ TSSTcorp CDDVDW SN-208AB   LA02
+
+           Type: CD-ROM               Name: /dev/disk12
+"""
+        self.assertEqual(recover_cd.optical_device_from_drutil_status(status), Path('/dev/rdisk12'))
+
 
 if __name__ == "__main__":
     unittest.main()

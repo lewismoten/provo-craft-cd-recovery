@@ -73,11 +73,10 @@ The converter derives each output TTF filename from its `.suit` source. Use `--f
 
 ```bash
 python3 scripts/recover_cd.py archive \
-  /dev/rdisk12 \
   "/path/to/archive/all-occasions.cdr"
 ```
 
-The archive step expects raw Mode-1 CD sectors. It never writes to the optical disc.
+`archive` automatically detects the inserted CD-ROM drive with macOS `drutil`. Use `--device /dev/rdisk12` only if automatic detection picks the wrong drive. The archive step expects raw Mode-1 CD sectors and never writes to the optical disc.
 
 ## Development
 

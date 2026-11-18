@@ -64,6 +64,22 @@ def require_tool(name: str) -> None:
         raise RuntimeError(f"Required command not found: {name}")
 
 
+def optical_device_from_drutil_status(status: str) -> Path:
+    match = re.search(r"\bName:\s*/dev/(r?disk\d+)\b", status)
+    if not match:
+        raise RuntimeError("No optical disc device was reported by drutil")
+    name = match.group(1)
+    return Path("/dev") / (name if name.startswith("r") else f"r{name}")
+
+
+def detect_optical_device() -> Path:
+    require_tool("drutil")
+    result = subprocess.run(["drutil", "status"], text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    if result.returncode:
+        raise RuntimeError(result.stderr.strip() or "drutil status failed")
+    return optical_device_from_drutil_status(result.stdout)
+
+
 def find_files(root: Path, suffix: str) -> list[Path]:
     return sorted(path for path in root.rglob(f"*{suffix}") if path.is_file())
 
@@ -217,16 +233,16 @@ def main() -> int:
     build_parser.add_argument("--disc-name", required=True)
     build_parser.add_argument("--font-name", help="optional display name override for a converted .suit font")
     build_parser.add_argument("--overwrite", action="store_true")
-    archive_parser = subparsers.add_parser("archive", help="make a raw Mode-1 CD archive and derived ISO")
-    archive_parser.add_argument("device", type=Path, help="raw device, e.g. /dev/rdisk12")
+    archive_parser = subparsers.add_parser("archive", help="auto-detect the current CD and make a raw Mode-1 archive plus derived ISO")
     archive_parser.add_argument("destination", type=Path, help="output .cdr path")
+    archive_parser.add_argument("--device", type=Path, help="optional raw-device override, e.g. /dev/rdisk12")
     args = parser.parse_args()
     try:
         if args.command == "build":
             layout = build(args.source, args.destination, args.disc_name, args.font_name, args.overwrite)
             print(layout.root)
         else:
-            archive(args.device, args.destination)
+            archive(args.device or detect_optical_device(), args.destination)
             print(args.destination)
     except RuntimeError as error:
         print(f"error: {error}", file=sys.stderr)
