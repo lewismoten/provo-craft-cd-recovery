@@ -62,16 +62,16 @@ The recovery set began with seven Provo Craft boxes found at an annual library b
 - **Creations On Computer: All Occasions** — Annette Ward; copyright August 1996; product no. 40-6072.
 - **Holidays** — Annette Ward; copyright August 1996; product no. 40-6073.
 
-## Recovery status
+## Recovered CDs
 
-| Disc | Product no. | Output folder | Credited creator | Copyright | PNG | SVG | Font | Status |
-| --- | --- | --- | --- | --- | ---: | ---: | --- | --- |
-| Rebecca's Winter Weather | 40-6068 | `CD/winter-weather` | Rebecca Carter | August 1996 | 216 | 216 | `Winter Weather Normal.ttf` | Recovered. |
-| Garden Party | 40-6069 | `CD/garden-party` | Rebecca Carter | August 1996 | 217 | 217 | `Garden Party Normal.ttf` | Recovered. |
-| Countryside Collection | 40-6070 | `CD/countryside` | Kathy Distefano Griffiths | August 1996 | 215 | 215 | `Countryside Normal.ttf` | Recovered. |
-| Four Seasons | 40-6071 | — | Kathy Distefano Griffiths | August 1996 | — | — | — | Not yet recovered. |
-| Creations On Computer: All Occasions | 40-6072 | `CD/all-occasions` | Annette Ward | August 1996 | 202 | 202 | `ALL OCCASIONS Normal.ttf` | Recovered. |
-| Holidays | 40-6073 | — | Annette Ward | August 1996 | — | — | — | Blocked: legacy artwork folders need layout detection. |
+| Disc | Product no. | Output folder | Credited creator | Copyright | PNG | SVG | Font |
+| --- | --- | --- | --- | --- | ---: | ---: | --- |
+| Rebecca's Winter Weather | 40-6068 | `winter-weather` | Rebecca Carter | August 1996 | 216 | 216 | `Winter Weather Normal.ttf` |
+| Garden Party | 40-6069 | `garden-party` | Rebecca Carter | August 1996 | 217 | 217 | `Garden Party Normal.ttf` |
+| Countryside Collection | 40-6070 | `countryside` | Kathy Distefano Griffiths | August 1996 | 215 | 215 | `Countryside Normal.ttf` |
+| Four Seasons | 40-6071 | `four-seasons` | Kathy Distefano Griffiths | August 1996 | 221 | 221 | `Four Seasons Normal.ttf` |
+| Creations On Computer: All Occasions | 40-6072 | `all-occasions` | Annette Ward | August 1996 | 202 | 202 | `ALL OCCASIONS Normal.ttf` |
+| Holidays | 40-6073 | `holidays` | Annette Ward | August 1996 | 199 | 198 | `Holidays Normal.ttf` |
 
 The following are **third-party Internet Archive listings**, included as historical discovery references only. They are not supplied or endorsed by this repository, and their availability does not grant permission to redistribute the original artwork, fonts, manuals, or disc images.
 

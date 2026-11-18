@@ -1,3 +1,4 @@
+import hashlib
 import importlib.util
 import io
 import sys
@@ -88,10 +89,19 @@ class OutputLayoutTests(unittest.TestCase):
 
         self.assertTrue(recover_cd.is_missing_hfs_path_error(error))
 
-    def test_font_folder_candidates_supports_both_legacy_layouts(self):
+    def test_asset_folder_candidates_support_classic_folder_variants(self):
         self.assertEqual(
-            recover_cd.font_folder_candidates('Garden Party'),
-            ['Garden Party:FONT:MAC', 'Garden Party:MAC FONT'],
+            recover_cd.asset_folder_candidates(),
+            {
+                'TIFF': ['MAC TIFF', 'MAC/TIFF'],
+                'EPS': ['MAC EPS', 'MAC/EPS'],
+            },
+        )
+
+    def test_font_folder_candidates_supports_all_legacy_layouts(self):
+        self.assertEqual(
+            recover_cd.font_folder_candidates('Holidays'),
+            ['Holidays:FONT:MAC', 'Holidays:MAC FONT', 'Holidays:MAC'],
         )
 
     def test_recovery_ejects_the_disc_after_an_extraction_failure(self):
@@ -130,7 +140,7 @@ class OutputLayoutTests(unittest.TestCase):
             checksum = temporary_path / 'disc.cdr.sha256'
             raw.write_bytes(b'raw')
             iso.write_bytes(b'iso')
-            checksum.write_text('checksum\n', encoding='utf-8')
+            checksum.write_text(f'{hashlib.sha256(raw.read_bytes()).hexdigest()}  disc.cdr\n', encoding='utf-8')
 
             layout = recover_cd.store_archive(raw, temporary_path / 'CD', 'Holidays')
 
@@ -138,6 +148,10 @@ class OutputLayoutTests(unittest.TestCase):
             self.assertTrue((layout.root / 'archive' / 'holidays.cdr').is_file())
             self.assertTrue((layout.root / 'archive' / 'holidays.iso').is_file())
             self.assertTrue((layout.root / 'archive' / 'holidays.cdr.sha256').is_file())
+            self.assertEqual(
+                (layout.root / 'archive' / 'holidays.cdr.sha256').read_text(encoding='utf-8'),
+                f'{hashlib.sha256(b"raw").hexdigest()}  holidays.cdr\n',
+            )
             self.assertFalse(raw.exists())
             self.assertFalse(iso.exists())
             self.assertFalse(checksum.exists())

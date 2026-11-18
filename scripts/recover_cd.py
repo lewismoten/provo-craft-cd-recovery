@@ -141,8 +141,16 @@ def is_missing_hfs_path_error(error: RuntimeError) -> bool:
     return "no such file or directory" in str(error).lower()
 
 
+def asset_folder_candidates() -> dict[str, list[str]]:
+    """Return known Macintosh artwork-folder variants by output format."""
+    return {
+        "TIFF": ["MAC TIFF", "MAC/TIFF"],
+        "EPS": ["MAC EPS", "MAC/EPS"],
+    }
+
+
 def font_folder_candidates(volume_name: str) -> list[str]:
-    return [f"{volume_name}:FONT:MAC", f"{volume_name}:MAC FONT"]
+    return [f"{volume_name}:FONT:MAC", f"{volume_name}:MAC FONT", f"{volume_name}:MAC"]
 
 
 def extract_classic_hfs(
@@ -161,9 +169,24 @@ def extract_classic_hfs(
         announce(f'Opened classic HFS volume: "{volume_name}"')
         if on_volume_open is not None:
             on_volume_open(volume_name)
-        for source_folder, target_folder, extension in (("MAC TIFF", "TIFF", ".tiff"), ("MAC EPS", "EPS", ".eps")):
+        for target_folder, source_folders in asset_folder_candidates().items():
+            categories: list[str] | None = None
+            source_folder: str | None = None
+            for candidate in source_folders:
+                try:
+                    categories = hfs_entries(f"{volume_name}:{candidate}")
+                    source_folder = candidate
+                    break
+                except RuntimeError as error:
+                    if not is_missing_hfs_path_error(error):
+                        raise
+            if categories is None or source_folder is None:
+                raise RuntimeError(
+                    f"No {target_folder} artwork folder found; tried: {', '.join(source_folders)}"
+                )
             announce(f"Extracting {source_folder} into {target_folder}/")
-            for category in hfs_entries(f"{volume_name}:{source_folder}"):
+            extension = ".tiff" if target_folder == "TIFF" else ".eps"
+            for category in categories:
                 source_path = f"{volume_name}:{source_folder}:{category}"
                 target_dir = destination / target_folder / safe_asset_name(category)
                 target_dir.mkdir(parents=True, exist_ok=True)
@@ -176,11 +199,14 @@ def extract_classic_hfs(
         font_items: list[str] | None = None
         for font_folder in font_folder_candidates(volume_name):
             try:
-                font_items = hfs_entries(font_folder)
-                break
+                candidate_items = hfs_entries(font_folder)
             except RuntimeError as error:
                 if not is_missing_hfs_path_error(error):
                     raise
+                continue
+            if any(item.lower().endswith((".suit", ".bmap")) for item in candidate_items):
+                font_items = candidate_items
+                break
         if font_items is None:
             announce("No Macintosh font directory is present; skipping font extraction")
         else:
@@ -433,10 +459,15 @@ def store_archive(raw_capture: Path, destination: Path, disc_name: str) -> Outpu
     archive_dir = layout.root / "archive"
     archive_dir.mkdir(parents=True, exist_ok=True)
     base = slugify(disc_name)
+    checksum_source = raw_capture.with_suffix(raw_capture.suffix + ".sha256")
+    checksum_line = checksum_source.read_text(encoding="utf-8").strip()
+    checksum_match = re.fullmatch(r"([0-9a-f]{64})\s+\S+", checksum_line)
+    if checksum_match is None:
+        raise RuntimeError(f"Invalid SHA-256 checksum file: {checksum_source}")
     artifacts = {
         raw_capture: archive_dir / f"{base}.cdr",
         raw_capture.with_suffix(".iso"): archive_dir / f"{base}.iso",
-        raw_capture.with_suffix(raw_capture.suffix + ".sha256"): archive_dir / f"{base}.cdr.sha256",
+        checksum_source: archive_dir / f"{base}.cdr.sha256",
     }
     for source, target in artifacts.items():
         if not source.is_file():
@@ -445,6 +476,10 @@ def store_archive(raw_capture: Path, destination: Path, disc_name: str) -> Outpu
             raise RuntimeError(f"Archive destination already exists: {target}")
     for source, target in artifacts.items():
         shutil.move(str(source), target)
+    artifacts[checksum_source].write_text(
+        f"{checksum_match.group(1)}  {artifacts[raw_capture].name}\n",
+        encoding="utf-8",
+    )
     return layout
 
 
