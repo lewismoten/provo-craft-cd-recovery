@@ -29,6 +29,10 @@ from typing import Iterable
 ARIAL = "/System/Library/Fonts/Supplemental/Arial.ttf"
 
 
+def announce(message: str) -> None:
+    print(message, flush=True)
+
+
 @dataclass(frozen=True)
 class OutputLayout:
     root: Path
@@ -66,6 +70,12 @@ def run_output(command: list[str]) -> str:
         detail = result.stderr.strip() or result.stdout.strip() or "unknown error"
         raise RuntimeError(f"Command failed: {' '.join(command[:2])}\n{detail}")
     return result.stdout
+
+
+def run_live(command: list[str]) -> None:
+    result = subprocess.run(command)
+    if result.returncode:
+        raise RuntimeError(f"Command failed: {' '.join(command[:2])}")
 
 
 def require_tool(name: str) -> None:
@@ -126,17 +136,23 @@ def extract_classic_hfs(hfs_device: Path, destination: Path) -> str:
     try:
         volume_name = volume_name_from_hmount_output(run_output(["hmount", str(hfs_device)]))
         mounted = True
+        announce(f'Opened classic HFS volume: "{volume_name}"')
         for source_folder, target_folder, extension in (("MAC TIFF", "TIFF", ".tiff"), ("MAC EPS", "EPS", ".eps")):
+            announce(f"Extracting {source_folder} into {target_folder}/")
             for category in hfs_entries(f"{volume_name}:{source_folder}"):
                 source_path = f"{volume_name}:{source_folder}:{category}"
                 target_dir = destination / target_folder / safe_asset_name(category)
                 target_dir.mkdir(parents=True, exist_ok=True)
-                for item in hfs_entries(source_path):
+                items = hfs_entries(source_path)
+                announce(f"  {category.strip()}: {len(items)} files")
+                for item in items:
                     target = target_dir / f"{safe_asset_name(item)}{extension}"
                     run(["hcopy", "-r", item, str(target)])
         font_dir = destination / "FONT (original Mac files)"
         font_dir.mkdir(parents=True, exist_ok=True)
-        for item in hfs_entries(f"{volume_name}:FONT:MAC"):
+        font_items = hfs_entries(f"{volume_name}:FONT:MAC")
+        announce(f"Extracting {len(font_items)} classic Macintosh font files")
+        for item in font_items:
             run(["hcopy", "-m", item, str(font_dir / f"{safe_asset_name(item)}.bin")])
         return volume_name
     finally:
@@ -151,25 +167,31 @@ def find_files(root: Path, suffix: str) -> list[Path]:
 def copy_as_gif(source_root: Path, layout: OutputLayout) -> list[dict[str, str]]:
     require_tool("magick")
     sources = find_files(source_root / "TIFF", ".tiff")
+    announce(f"Converting {len(sources)} TIFF files to 2-color GIF")
     records: list[dict[str, str]] = []
-    for source in sources:
+    for number, source in enumerate(sources, 1):
         target = (layout.gif_dir / source.relative_to(source_root / "TIFF")).with_suffix(".gif")
         target.parent.mkdir(parents=True, exist_ok=True)
         # The recovered TIFF artwork is 1-bit; keep GIF palette minimal.
         run(["magick", str(source), "-type", "Bilevel", "-colors", "2", str(target)])
         records.append({"source": str(source.relative_to(source_root)), "output": str(target.relative_to(layout.root))})
+        if number % 25 == 0 or number == len(sources):
+            announce(f"  GIF {number}/{len(sources)}")
     return records
 
 
 def copy_as_svg(source_root: Path, layout: OutputLayout) -> list[dict[str, str]]:
     require_tool("pstoedit")
     sources = find_files(source_root / "EPS", ".eps")
+    announce(f"Converting {len(sources)} EPS files to SVG")
     records: list[dict[str, str]] = []
-    for source in sources:
+    for number, source in enumerate(sources, 1):
         target = (layout.svg_dir / source.relative_to(source_root / "EPS")).with_suffix(".svg")
         target.parent.mkdir(parents=True, exist_ok=True)
         run(["pstoedit", "-f", "svg:-standalone", str(source), str(target)])
         records.append({"source": str(source.relative_to(source_root)), "output": str(target.relative_to(layout.root))})
+        if number % 25 == 0 or number == len(sources):
+            announce(f"  SVG {number}/{len(sources)}")
     return records
 
 
@@ -198,6 +220,7 @@ def convert_suitcase(source_root: Path, layout: OutputLayout, font_name: str | N
     require_tool("fontforge")
     resolved_name = font_name or font_name_from_suitcase(suitcase)
     target = layout.font_path(resolved_name)
+    announce(f'Converting Macintosh suitcase "{suitcase.name}" to "{target.name}"')
     postscript_name = re.sub(r"[^A-Za-z0-9]", "", resolved_name) or "RecoveredFont"
     code = (
         "import fontforge,sys; "
@@ -217,6 +240,7 @@ def create_contact_sheets(layout: OutputLayout, columns: int = 8, rows: int = 8)
         return []
     if not Path(ARIAL).is_file():
         raise RuntimeError(f"Required label font is missing: {ARIAL}")
+    announce(f"Creating labeled {columns}x{rows} contact sheets for {len(sources)} GIF files")
     per_sheet = columns * rows
     names: list[str] = []
     with tempfile.TemporaryDirectory(prefix="provo-craft-cells-") as temp:
@@ -231,6 +255,8 @@ def create_contact_sheets(layout: OutputLayout, columns: int = 8, rows: int = 8)
                 "-append", "-background", "white", "-gravity", "center", "-extent", "254x254", "-bordercolor", "#c8c8c8", "-border", "1", str(cell),
             ])
             cells.append(cell)
+            if number % 25 == 0 or number == len(sources):
+                announce(f"  Thumbnail {number}/{len(sources)}")
         for page, start in enumerate(range(0, len(cells), per_sheet), 1):
             group = cells[start : start + per_sheet]
             # Last page shrinks to fit rather than adding blank contact cells.
@@ -238,6 +264,7 @@ def create_contact_sheets(layout: OutputLayout, columns: int = 8, rows: int = 8)
             target = layout.contact_sheet(page)
             run(["magick", "montage", *map(str, group), "-tile", f"{columns}x{page_rows}", "-geometry", "256x256+0+0", "-background", "white", str(target)])
             names.append(target.name)
+            announce(f"  Wrote {target.name}")
     return names
 
 
@@ -249,6 +276,7 @@ def build(source: Path, destination: Path, disc_name: str, font_name: str | None
         raise RuntimeError(f"Output already exists: {layout.root} (use --overwrite to replace it)")
     if layout.root.exists():
         shutil.rmtree(layout.root)
+    announce(f'Building modern assets for "{disc_name}" in {layout.root}')
     layout.gif_dir.mkdir(parents=True)
     layout.svg_dir.mkdir(parents=True)
     gifs = copy_as_gif(source, layout)
@@ -265,6 +293,7 @@ def build(source: Path, destination: Path, disc_name: str, font_name: str | None
         "Recovered from a legacy Provo Craft CD-ROM. Generated content is intentionally separate from this scripts repository.\n",
         encoding="utf-8",
     )
+    announce(f"Finished {layout.root}")
     return layout
 
 
@@ -273,7 +302,10 @@ def archive(device: Path, destination: Path) -> None:
     require_tool("dd")
     if destination.exists():
         raise RuntimeError(f"Refusing to overwrite: {destination}")
-    run(["dd", f"if={device}", f"of={destination}", "bs=2352"])
+    announce(f"Capturing raw CD sectors from {device} to {destination}")
+    announce("  Reading the disc now; dd progress will update while the CD spins.")
+    run_live(["dd", f"if={device}", f"of={destination}", "bs=2352", "status=progress"])
+    announce("Deriving a 2048-byte-sector ISO from the raw capture")
     raw = destination.read_bytes()
     if len(raw) % 2352:
         raise RuntimeError("Raw capture is not an integer number of 2352-byte sectors")
@@ -286,22 +318,26 @@ def archive(device: Path, destination: Path) -> None:
             output.write(sector[16:2064])
     checksum = hashlib.sha256(raw).hexdigest()
     destination.with_suffix(destination.suffix + ".sha256").write_text(f"{checksum}  {destination.name}\n", encoding="utf-8")
+    announce("Wrote raw archive, derived ISO, and SHA-256 checksum")
 
 
 def recover_current_cd(destination: Path, overwrite: bool, device: Path | None = None) -> OutputLayout:
     """Run the complete read-only capture, HFS extraction, and conversion workflow."""
     device = device or detect_optical_device()
+    announce(f"Detected optical drive: {device}")
     destination.mkdir(parents=True, exist_ok=True)
     with tempfile.TemporaryDirectory(prefix="provo-craft-recover-") as temporary:
         temp = Path(temporary)
         raw_capture = temp / "disc.cdr"
         archive(device, raw_capture)
         iso = raw_capture.with_suffix(".iso")
+        announce("Attaching the derived ISO read-only")
         whole_disk, hfs_partition = attach_hfs_iso(iso)
         extracted = temp / "extracted"
         try:
             disc_name = extract_classic_hfs(hfs_partition, extracted)
         finally:
+            announce("Detaching the read-only ISO")
             run(["hdiutil", "detach", str(whole_disk)])
         layout = build(extracted, destination, disc_name, None, overwrite)
         archive_dir = layout.root / "archive"
@@ -310,6 +346,7 @@ def recover_current_cd(destination: Path, overwrite: bool, device: Path | None =
         shutil.move(str(raw_capture), archive_dir / f"{base}.cdr")
         shutil.move(str(iso), archive_dir / f"{base}.iso")
         shutil.move(str(raw_capture.with_suffix(raw_capture.suffix + ".sha256")), archive_dir / f"{base}.cdr.sha256")
+        announce(f"Recovery complete: {layout.root}")
         return layout
 
 

@@ -1,5 +1,7 @@
 import importlib.util
+import io
 import unittest
+from contextlib import redirect_stdout
 from pathlib import Path
 
 SCRIPT = Path(__file__).parents[1] / "scripts" / "recover_cd.py"
@@ -32,6 +34,12 @@ class OutputLayoutTests(unittest.TestCase):
     def test_volume_name_from_hmount_output_uses_classic_hfs_name(self):
         output = 'Volume name is "All Occasions" (locked)\nVolume has 91815936 bytes free\n'
         self.assertEqual(recover_cd.volume_name_from_hmount_output(output), 'All Occasions')
+
+    def test_announce_writes_a_visible_step_message(self):
+        stream = io.StringIO()
+        with redirect_stdout(stream):
+            recover_cd.announce('Extracting TIFF files')
+        self.assertEqual(stream.getvalue(), 'Extracting TIFF files\n')
 
 
 if __name__ == "__main__":

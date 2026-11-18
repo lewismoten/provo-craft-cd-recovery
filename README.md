@@ -61,7 +61,7 @@ For normal use, run the complete workflow instead:
 python3 scripts/recover_cd.py recover
 ```
 
-It detects the inserted CD-ROM drive, reads the classic-Mac HFS volume name, then writes the full result to `CD/<detected-disc-name>/`. That folder is Git-ignored and includes the raw archive in `archive/`, root-level contact sheets and converted TTF fonts, plus `GIF/` and `SVG/` directories.
+It detects the inserted CD-ROM drive, reads the classic-Mac HFS volume name, then writes the full result to `CD/<detected-disc-name>/`. Every major step and conversion batch is printed as it runs; raw capture also exposes `dd` progress while the CD spins. That folder is Git-ignored and includes the raw archive in `archive/`, root-level contact sheets and converted TTF fonts, plus `GIF/` and `SVG/` directories.
 
 ## Requirements
 
