@@ -81,6 +81,11 @@ class OutputLayoutTests(unittest.TestCase):
             'dd', 'if=/dev/rdisk12', 'bs=301056', 'count=2',
         ])
 
+    def test_missing_hfs_path_error_is_optional_font_folder(self):
+        error = RuntimeError('Command failed: hcd Garden Party:FONT:MAC\nhcd: "Garden Party:FONT:MAC": no such file or directory')
+
+        self.assertTrue(recover_cd.is_missing_hfs_path_error(error))
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -136,6 +136,10 @@ def hfs_entries(path: str) -> list[str]:
     return [entry for entry in run_output(["hls", "-1", "-N"]).splitlines() if entry]
 
 
+def is_missing_hfs_path_error(error: RuntimeError) -> bool:
+    return "no such file or directory" in str(error).lower()
+
+
 def extract_classic_hfs(hfs_device: Path, destination: Path) -> str:
     """Export known Provo Craft asset folders from a read-only classic HFS image."""
     for tool in ("hmount", "humount", "hcd", "hls", "hcopy"):
@@ -158,11 +162,17 @@ def extract_classic_hfs(hfs_device: Path, destination: Path) -> str:
                     target = target_dir / f"{safe_asset_name(item)}{extension}"
                     run(["hcopy", "-r", item, str(target)])
         font_dir = destination / "FONT (original Mac files)"
-        font_dir.mkdir(parents=True, exist_ok=True)
-        font_items = hfs_entries(f"{volume_name}:FONT:MAC")
-        announce(f"Extracting {len(font_items)} classic Macintosh font files")
-        for item in font_items:
-            run(["hcopy", "-m", item, str(font_dir / f"{safe_asset_name(item)}.bin")])
+        try:
+            font_items = hfs_entries(f"{volume_name}:FONT:MAC")
+        except RuntimeError as error:
+            if not is_missing_hfs_path_error(error):
+                raise
+            announce("No FONT:MAC directory is present; skipping font extraction")
+        else:
+            font_dir.mkdir(parents=True, exist_ok=True)
+            announce(f"Extracting {len(font_items)} classic Macintosh font files")
+            for item in font_items:
+                run(["hcopy", "-m", item, str(font_dir / f"{safe_asset_name(item)}.bin")])
         return volume_name
     finally:
         if mounted:
