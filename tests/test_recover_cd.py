@@ -1,12 +1,16 @@
 import importlib.util
 import io
+import sys
 import unittest
 from contextlib import redirect_stdout
 from pathlib import Path
 
 SCRIPT = Path(__file__).parents[1] / "scripts" / "recover_cd.py"
 spec = importlib.util.spec_from_file_location("recover_cd", SCRIPT)
+if spec is None or spec.loader is None:
+    raise RuntimeError(f"Unable to load {SCRIPT}")
 recover_cd = importlib.util.module_from_spec(spec)
+sys.modules[spec.name] = recover_cd
 spec.loader.exec_module(recover_cd)
 
 

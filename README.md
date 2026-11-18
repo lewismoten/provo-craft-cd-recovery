@@ -4,6 +4,8 @@ Scripts for preserving and modernizing the 1996 Provo Craft electronic clip-art 
 
 This repository contains **scripts only**. It does not include disc images, clip art, fonts, or other recovered assets. The MIT License applies only to this repository's scripts and documentation; all extracted CD content remains subject to its original copyright and license terms. See [CONTENT_RIGHTS.md](CONTENT_RIGHTS.md).
 
+![Illustration of the Provo Craft CD recovery workflow: CD-ROM to archive, PNG, SVG, and TTF](assets/provo-craft-cd-recovery-banner.png)
+
 ## Original system requirements, circa 1996
 
 The discs asked for what was then a serious workstation:
