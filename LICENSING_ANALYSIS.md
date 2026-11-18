@@ -20,6 +20,12 @@ The manuals describe the designs and fonts as licensed, not freely transferable.
 
 The network clause is the one that now feels most severe. It measures the number of copies required by **potential simultaneous access**, not by the number of people actually making artwork.
 
+## The use the license appears to contemplate
+
+The manuals appear to have been written for printed, limited-run work: newsletters, greeting cards, calendars, hand-finished craft projects, and other physical pieces passed around a neighborhood, workplace, club, or community event. Their examples allow limited photocopying for hand-finished resale and limited non-profit reproduction, such as a church function, while drawing a line at mass production and mass distribution.
+
+That is a very different model from posting a reusable digital asset online. The finished item is tangible and short-lived; the original files stay with the licensed user. Even those physical uses remain subject to the manual's stated limits, but they seem closer to the practical use the package had in mind.
+
 ## A 1996 rule in a modern household
 
 The license assumes a simple setup: one person puts the CD in one computer, keeps the files on that computer, and does not send them to anyone else. That was a realistic way to use clip art in 1996.
