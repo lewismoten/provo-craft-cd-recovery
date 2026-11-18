@@ -41,6 +41,7 @@ The manuals were frank that these CDs were **not easily DOS-compatible**. Their 
 - **TIFF** was the fairly universal option: designed to be straightforward to use in graphics and drawing programs.
 - Some discs included grayscale TIFFs as a bonus for people with enough memory to work with them.
 - One insert warned that PrintShop could import only 256-color TIFFs. It listed The Print Shop Ensemble, Ensemble II, Ensemble III, and The Print Shop Deluxe II as unable to accept those images; older editions of The Print Shop Deluxe, limited to 16-color TIFFs, could import the graphics.
+- The **Countryside Collection** insert directed The Print Shop Deluxe II and all Print Shop Ensemble users to the WMF files; its TIFF files were for The Print Shop Deluxe. For Paintbrush for Windows 95, it specifically said not to **Open** the TIFFs: use **Edit → Paste From**, select **All File Formats**, and import the TIFF from there.
 
 The manuals named a period software shelf that included QuarkXPress, WordPerfect 5.0+, Microsoft Word 5.0+, ClarisWorks, CorelDRAW! 4.0+, Draw 4.0, Aldus PhotoStyler, Adobe Photoshop, Adobe Illustrator 3.0, Microsoft Works 4.0, Aldus PageMaker 4.0+, Print Artist 3.0+, The Print Shop Deluxe/II/III, and Adobe PhotoDeluxe.
 
@@ -50,7 +51,20 @@ This project leans into that history while widening compatibility for current so
 
 The recovery set began with seven Provo Craft boxes found at an annual library book sale on the final **Name Your Price Day**. The lot cost $5, supporting the library; that same five dollars also covered *Spinal Tap: Break Like the Wind*, an Ear Food album originally marked $6.99 and later stickered at $0.50. Its eventual export will, appropriately, go to 11.
 
+## Disc credits noted on the packaging
 
+- **All Occasions** — Annette Ward.
+- **All Creations** — copyright August 1996.
+- **Garden Party** — Rebecca Carter; copyright August 1996.
+- **Countryside Collection** — Kathy Distefano Griffiths; copyright August 1996.
+
+## Recovery status
+
+| Disc | Credited creator | Copyright | Current result |
+| --- | --- | --- | --- |
+| All Occasions | Annette Ward | — | Recovered: 202 PNGs, 202 SVGs, one TTF, and four contact sheets. |
+| Garden Party | Rebecca Carter | August 1996 | Recovered: 217 PNGs, 217 SVGs, one TTF, and four contact sheets. |
+| Countryside Collection | Kathy Distefano Griffiths | August 1996 | Recovered to `CD/countryside`: 215 PNGs, 215 SVGs, one TTF, and four contact sheets. |
 
 ## What it does
 
