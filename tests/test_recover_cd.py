@@ -59,11 +59,12 @@ class OutputLayoutTests(unittest.TestCase):
         self.assertEqual(commands, [['diskutil', 'eject', '/dev/disk12']])
         self.assertEqual(stream.getvalue(), 'Ejecting CD: /dev/disk12\n')
 
-    def test_png_conversion_command_preserves_transparent_white_background(self):
+    def test_png_conversion_command_makes_only_edge_connected_white_transparent(self):
         command = recover_cd.png_conversion_command(Path('artwork.tiff'), Path('artwork.png'))
 
         self.assertEqual(command, [
-            'magick', 'artwork.tiff', '-transparent', 'white', '-depth', '1',
+            'magick', 'artwork.tiff', '-alpha', 'off', '-bordercolor', 'white', '-border', '1',
+            '-fill', 'none', '-draw', 'color 0,0 floodfill', '-shave', '1x1', '-depth', '1',
             '-strip', '-compress', 'Zip', 'artwork.png',
         ])
 
@@ -85,6 +86,12 @@ class OutputLayoutTests(unittest.TestCase):
         error = RuntimeError('Command failed: hcd Garden Party:FONT:MAC\nhcd: "Garden Party:FONT:MAC": no such file or directory')
 
         self.assertTrue(recover_cd.is_missing_hfs_path_error(error))
+
+    def test_font_folder_candidates_supports_both_legacy_layouts(self):
+        self.assertEqual(
+            recover_cd.font_folder_candidates('Garden Party'),
+            ['Garden Party:FONT:MAC', 'Garden Party:MAC FONT'],
+        )
 
 
 if __name__ == "__main__":

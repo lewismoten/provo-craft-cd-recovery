@@ -140,6 +140,10 @@ def is_missing_hfs_path_error(error: RuntimeError) -> bool:
     return "no such file or directory" in str(error).lower()
 
 
+def font_folder_candidates(volume_name: str) -> list[str]:
+    return [f"{volume_name}:FONT:MAC", f"{volume_name}:MAC FONT"]
+
+
 def extract_classic_hfs(hfs_device: Path, destination: Path) -> str:
     """Export known Provo Craft asset folders from a read-only classic HFS image."""
     for tool in ("hmount", "humount", "hcd", "hls", "hcopy"):
@@ -162,12 +166,16 @@ def extract_classic_hfs(hfs_device: Path, destination: Path) -> str:
                     target = target_dir / f"{safe_asset_name(item)}{extension}"
                     run(["hcopy", "-r", item, str(target)])
         font_dir = destination / "FONT (original Mac files)"
-        try:
-            font_items = hfs_entries(f"{volume_name}:FONT:MAC")
-        except RuntimeError as error:
-            if not is_missing_hfs_path_error(error):
-                raise
-            announce("No FONT:MAC directory is present; skipping font extraction")
+        font_items: list[str] | None = None
+        for font_folder in font_folder_candidates(volume_name):
+            try:
+                font_items = hfs_entries(font_folder)
+                break
+            except RuntimeError as error:
+                if not is_missing_hfs_path_error(error):
+                    raise
+        if font_items is None:
+            announce("No Macintosh font directory is present; skipping font extraction")
         else:
             font_dir.mkdir(parents=True, exist_ok=True)
             announce(f"Extracting {len(font_items)} classic Macintosh font files")
@@ -186,7 +194,8 @@ def find_files(root: Path, suffix: str) -> list[Path]:
 def png_conversion_command(source: Path, target: Path) -> list[str]:
     """Convert black-on-white legacy TIFF art into a compact transparent PNG."""
     return [
-        "magick", str(source), "-transparent", "white", "-depth", "1",
+        "magick", str(source), "-alpha", "off", "-bordercolor", "white", "-border", "1",
+        "-fill", "none", "-draw", "color 0,0 floodfill", "-shave", "1x1", "-depth", "1",
         "-strip", "-compress", "Zip", str(target),
     ]
 
