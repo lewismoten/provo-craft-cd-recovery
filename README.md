@@ -60,6 +60,7 @@ The recovery set began with seven Provo Craft boxes found at an annual library b
 - **Garden Party** — Rebecca Carter; copyright August 1996.
 - **Countryside Collection** — Kathy Distefano Griffiths; copyright August 1996.
 - **Rebecca's Winter Weather** — Rebecca Carter; copyright August 1996.
+- **Holidays** — Annette Ward; copyright August 1996.
 
 ## Recovery status
 
@@ -69,6 +70,7 @@ The recovery set began with seven Provo Craft boxes found at an annual library b
 | Garden Party | `CD/garden-party` | Rebecca Carter | August 1996 | 217 | 217 | `Garden Party Normal.ttf` | Recovered. |
 | Countryside Collection | `CD/countryside` | Kathy Distefano Griffiths | August 1996 | 215 | 215 | `Countryside Normal.ttf` | Recovered. |
 | Rebecca's Winter Weather | — | Rebecca Carter | August 1996 | — | — | — | Recovery running. |
+| Holidays | — | Annette Ward | August 1996 | — | — | — | Being processed. |
 
 ## What it does
 
