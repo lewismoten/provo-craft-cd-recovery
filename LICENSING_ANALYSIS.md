@@ -1,77 +1,54 @@
-# Reading a 1996 single-user CD-ROM license in a networked home
+# A 1996 CD-ROM license in a networked home
 
-> **Context, not legal advice.** This page reads the recurring license language printed in the manuals for the recovered Provo Craft discs. It does not determine the license's enforceability, ownership of a particular copy, or anyone's legal rights. The original package terms and applicable law control.
+> **Historical context, not legal advice.** This page reads recurring license language printed in the manuals for the recovered Provo Craft discs. It does not decide whether those terms are enforceable, who owns a particular copy, or what a particular use permits. The original package terms and applicable law control.
 
-## Why preserve this language?
+The terms are worth preserving because they capture a particular moment. In 1996, clip art arrived on a physical CD-ROM and usually lived on one desktop computer. BBSs, online services, and consumer internet access already gave people ways to exchange files, while the Web was beginning to reach a much broader public.
 
-The license is part of the historical record. It describes a late-1990s model in which clip art lived on one physical CD-ROM, a household commonly used one desktop computer, and local networks were comparatively unusual. Bulletin board systems (BBSs), online services, and early consumer internet access were already familiar ways to exchange files, while the Web was beginning to reach a much broader public than it had earlier in the decade.
+That transition worried publishers and authors. A work that had circulated through a physical retail channel could suddenly reach a huge audience without another sale. There were few settled consumer expectations around online distribution at that scale. This license reads like an attempt to protect a CD-ROM-era market before the normal habits of networked life had settled.
 
-The recovered discs are still governed by their original content terms. This repository therefore publishes recovery scripts and documentation only—not disc images, artwork, fonts, contact sheets, or other recovered output.
+## What the manuals say
 
-## A license written for an uncertain transition
+The manuals describe the designs and fonts as licensed, not freely transferable. Their recurring terms can be summarized this way:
 
-In the lead-up to widespread consumer internet adoption, many publishers and authors were concerned that their work could suddenly reach a mass audience without compensation. The technology and its social norms were new, and there were few settled consumer precedents for online distribution at that scale.
-
-This license reflects that caution. Its limits make sense as an attempt to preserve a CD-ROM-era market, but they are much more restrictive than the sharing, backup, synchronization, and multi-device use that many households now treat as ordinary computing. That historical context explains the tension; it does not override the printed terms.
-
-## The recurring restrictions
-
-The manuals say that the designs and fonts are licensed rather than freely transferable. In plain language, the recurring terms say:
-
-| Manual term | Practical effect described by the manual |
+| Manual term | Effect described by the manual |
 | --- | --- |
-| **Single user** | Each purchased CD-ROM is assigned to one user. Giving it to friends, relatives, or coworkers is forbidden. |
+| **Single user** | Each purchased CD-ROM is for one user. Giving it to friends, relatives, or coworkers is forbidden. |
 | **Household use** | Personal or professional use is described as including members of the purchaser's household. |
-| **Network installation** | Installation on any network is prohibited unless one CD-ROM has been purchased for every person who could access it at the same time. |
+| **Network installation** | Installation on any network is prohibited unless a CD-ROM has been purchased for every person who could access it at the same time. |
 | **Internet distribution** | Transmission or distribution of the images over the internet, World Wide Web, or similar networks is described as a license violation. |
-| **Commercial limits** | Limited professional use is described, while mass production, mass distribution, and commercial marketing of the images require permission. |
+| **Commercial limits** | Limited professional use is described, while mass production, mass distribution, and commercial marketing require permission. |
 
-The exact wording matters. For example, the manuals describe a restriction on **installing the files on a network**; they do not expressly say that a standalone computer becomes noncompliant merely because it is connected to a home router.
+The network clause is the one that now feels most severe. It measures the number of copies required by **potential simultaneous access**, not by the number of people actually making artwork.
 
-## Why it feels unusually restrictive today
+## A 1996 rule in a modern household
 
-### 1996: a single-machine model
+The license assumes a simple setup: one person puts the CD in one computer, keeps the files on that computer, and does not send them to anyone else. That was a realistic way to use clip art in 1996.
 
-The license assumes a fairly simple workflow:
+A present-day household is different. Wi-Fi, cloud backup, synchronized folders, shared storage, remote access, and several personal devices are ordinary. A strict reading of the license makes routine conveniences awkward if they put recovered files where more than one person could reach them.
 
-1. Insert a physical CD-ROM into one computer.
-2. Install or open the files locally for one person.
-3. Keep the files out of shared networks and avoid sending them to others.
+Examples that deserve caution under the manual's wording include:
 
-That model could be followed by keeping the files on a single desktop drive and using the artwork locally.
+- copying artwork or fonts to a NAS, family server, or shared folder;
+- using a sync service that makes them available across household devices;
+- installing the files at a network location with multiple possible users; and
+- emailing, posting, chatting, or otherwise publishing the artwork online.
 
-### Today: ordinary computing is networked by default
+A connected computer is not automatically a prohibited network installation. The manuals restrict *installing files on a network*; they do not expressly require a standalone computer to stay disconnected from a home router. The boundary gets blurry because modern backup and sync tools can create network-accessible copies without feeling like a deliberate network deployment.
 
-A current household often has several computers, phones, tablets, a Wi-Fi router, shared printers, network-attached storage, cloud backup, synchronized folders, and household accounts. A strict reading of the network clause becomes awkward when ordinary conveniences can make a file accessible from more than one device or account.
+This is why the license is more restrictive than current expectations around backup, synchronization, and family devices. That context explains the tension. It does not erase the printed terms.
 
-Examples of modern situations that deserve caution under the manual's wording include:
+## Why this repository keeps demonstrations local
 
-- copying the artwork or fonts to a NAS, shared folder, or family server;
-- placing the files in a sync service that makes them available across household devices;
-- installing the files where multiple people may access the same network location; and
-- sending artwork in email, chat, a web page, or social-media post.
+The project considered a small specimen image that rendered each font's name in that font. It also considered a social preview showing recovered clip art in color or a contact-sheet-style selection of recovered artwork.
 
-The most striking phrase is the requirement for a CD-ROM for every person who could access a network installation **at the same time**. In a modern family home, that condition can be much broader than the number of people actively using the clip art. It treats potential simultaneous access—not actual creative use—as the relevant limit.
+The manuals' prohibition on internet transmission and distribution of the images is too restrictive for this project to treat those demonstrations as authorized just because they would be small, recolored, cropped, shown in perspective, or otherwise derivative. That is a conservative project decision, not a legal conclusion about every possible derivative use.
 
-## The important distinction: connected is not necessarily shared
+The public social-preview illustration in this repository is newly created repository artwork. It does not contain recovered Provo Craft clip art, recovered contact sheets, font files, or renderings made from the recovered fonts.
 
-This analysis should not overread the license. A computer connected to Wi-Fi is not automatically the same thing as a network installation of the recovered files. The manuals target installation and access over a network.
+## The repository boundary
 
-But modern systems blur the boundary. Automatic backup, cloud synchronization, shared household storage, remote access, and collaboration tools can turn a local-looking folder into a network-accessible copy without much deliberate setup. That ambiguity is one reason this project keeps all recovered material in the Git-ignored `CD/` directory and keeps the public repository limited to tools and documentation.
+This repository publishes recovery scripts, dependency setup, tests, and historical documentation. It does not publish raw disc images, extracted clip art, converted PNG or SVG files, recovered font files, contact sheets, font specimens, or other recovered output. Those materials remain in the Git-ignored `CD/` directory.
 
-## A deliberately limited public demonstration
-
-This project considered publishing a small image that rendered each font's name in that font, along with a social-preview image showing some clip art in color or a contact-sheet-style selection of recovered artwork. The manuals' prohibition on internet transmission and distribution of the images is too restrictive for this project to treat those demonstrations as authorized merely because they would be small, recolored, cropped, presented in perspective, or otherwise derivative.
-
-This is a conservative project decision, not a legal conclusion about every possible derivative use. The public social-preview illustration in this repository is newly created repository artwork; it does not contain recovered Provo Craft clip art, contact sheets, font files, or renderings made from the recovered fonts.
-
-## What this repository does—and does not—claim
-
-This project documents the manual language and adopts a conservative publishing boundary:
-
-- Recovery scripts, dependency setup, tests, and historical documentation are published.
-- Raw disc images, extracted clip art, converted PNG/SVG files, recovered font files, contact sheets, and font specimens remain local.
-- References to third-party archival listings are historical pointers, not permissions to redistribute the material.
-- No conclusion is made here about whether a particular private archive, backup, household setup, preview image, or publication would be permitted or enforceable.
+Third-party archival listings are historical pointers, not permission to redistribute the underlying material. Nothing here decides whether a particular private archive, backup, household setup, preview image, or publication is permitted.
 
 For a decision with legal consequences, consult the original packaging and a qualified attorney in the relevant jurisdiction.
