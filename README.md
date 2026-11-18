@@ -73,6 +73,16 @@ The recovery set began with seven Provo Craft boxes found at an annual library b
 | Creations On Computer: All Occasions | 40-6072 | `CD/all-occasions` | Annette Ward | August 1996 | 202 | 202 | `ALL OCCASIONS Normal.ttf` | Recovered. |
 | Holidays | 40-6073 | — | Annette Ward | August 1996 | — | — | — | Blocked: legacy artwork folders need layout detection. |
 
+The following are **third-party Internet Archive listings**, included as historical discovery references only. They are not supplied or endorsed by this repository, and their availability does not grant permission to redistribute the original artwork, fonts, manuals, or disc images.
+
+| Disc | Product no. | External archive reference |
+| --- | --- | --- |
+| Garden Party | 40-6069 | [Internet Archive listing](https://archive.org/details/garden-party-designs-by-rebecca-carter) |
+| Creations On Computer: All Occasions | 40-6072 | [Internet Archive listing](https://archive.org/details/annettewardalloccasions) |
+| Holidays | 40-6073 | [Internet Archive listing](https://archive.org/details/annettewardholidays) |
+
+Other titles will be added only when a listing can be matched to the disc title and product number.
+
 ## What it does
 
 `scripts/recover_cd.py` supports two steps:
