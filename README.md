@@ -59,6 +59,7 @@ The recovery set began with seven Provo Craft boxes found at an annual library b
 - **All Creations** — copyright August 1996; product no. 40-6072.
 - **Garden Party** — Rebecca Carter; copyright August 1996; product no. 40-6069.
 - **Countryside Collection** — Kathy Distefano Griffiths; copyright August 1996; product no. 40-6070.
+- **Four Seasons** — Kathy Distefano Griffiths; copyright August 1996; product no. 40-6071.
 - **Rebecca's Winter Weather** — Rebecca Carter; copyright August 1996; product no. 40-6068.
 - **Holidays** — Annette Ward; copyright August 1996; product no. 40-6073.
 
@@ -69,6 +70,7 @@ The recovery set began with seven Provo Craft boxes found at an annual library b
 | All Occasions | — | `CD/all-occasions` | Annette Ward | August 1996 | 202 | 202 | `ALL OCCASIONS Normal.ttf` | Recovered. |
 | Garden Party | 40-6069 | `CD/garden-party` | Rebecca Carter | August 1996 | 217 | 217 | `Garden Party Normal.ttf` | Recovered. |
 | Countryside Collection | 40-6070 | `CD/countryside` | Kathy Distefano Griffiths | August 1996 | 215 | 215 | `Countryside Normal.ttf` | Recovered. |
+| Four Seasons | 40-6071 | — | Kathy Distefano Griffiths | August 1996 | — | — | — | Not yet recovered. |
 | Rebecca's Winter Weather | 40-6068 | `CD/winter-weather` | Rebecca Carter | August 1996 | 216 | 216 | `Winter Weather Normal.ttf` | Recovered. |
 | Holidays | 40-6073 | — | Annette Ward | August 1996 | — | — | — | Being processed. |
 
