@@ -2,6 +2,8 @@
 
 Scripts for preserving and modernizing the 1996 Provo Craft electronic clip-art CD-ROM collection.
 
+Every title documented here so far is marked **copyright August 1996**. The shared month and year suggest these boxes were released as a contemporaneous collection.
+
 This repository contains **scripts only**. It does not include disc images, clip art, fonts, or other recovered assets. The MIT License applies only to this repository's scripts and documentation; all extracted CD content remains subject to its original copyright and license terms. See [CONTENT_RIGHTS.md](CONTENT_RIGHTS.md).
 
 ![Illustration of the Provo Craft CD recovery workflow: CD-ROM to archive, PNG, SVG, and TTF](assets/provo-craft-cd-recovery-banner.png)
@@ -53,7 +55,7 @@ The recovery set began with seven Provo Craft boxes found at an annual library b
 
 ## Disc credits noted on the packaging
 
-- **All Occasions** — Annette Ward.
+- **All Occasions** — Annette Ward; copyright August 1996.
 - **All Creations** — copyright August 1996.
 - **Garden Party** — Rebecca Carter; copyright August 1996.
 - **Countryside Collection** — Kathy Distefano Griffiths; copyright August 1996.
@@ -61,12 +63,12 @@ The recovery set began with seven Provo Craft boxes found at an annual library b
 
 ## Recovery status
 
-| Disc | Credited creator | Copyright | PNG | SVG | Font | Status |
-| --- | --- | --- | ---: | ---: | --- | --- |
-| All Occasions | Annette Ward | — | 202 | 202 | `ALL OCCASIONS Normal.ttf` | Recovered. |
-| Garden Party | Rebecca Carter | August 1996 | 217 | 217 | `Garden Party Normal.ttf` | Recovered. |
-| Countryside Collection | Kathy Distefano Griffiths | August 1996 | 215 | 215 | `Countryside Normal.ttf` | Recovered to `CD/countryside`. |
-| Rebecca's Winter Weather | Rebecca Carter | August 1996 | — | — | — | Recovery running. |
+| Disc | Output folder | Credited creator | Copyright | PNG | SVG | Font | Status |
+| --- | --- | --- | --- | ---: | ---: | --- | --- |
+| All Occasions | `CD/all-occasions` | Annette Ward | August 1996 | 202 | 202 | `ALL OCCASIONS Normal.ttf` | Recovered. |
+| Garden Party | `CD/garden-party` | Rebecca Carter | August 1996 | 217 | 217 | `Garden Party Normal.ttf` | Recovered. |
+| Countryside Collection | `CD/countryside` | Kathy Distefano Griffiths | August 1996 | 215 | 215 | `Countryside Normal.ttf` | Recovered. |
+| Rebecca's Winter Weather | — | Rebecca Carter | August 1996 | — | — | — | Recovery running. |
 
 ## What it does
 
