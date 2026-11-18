@@ -2,7 +2,7 @@
 
 Scripts for preserving and modernizing the 1996 Provo Craft electronic clip-art CD-ROM collection.
 
-This repository contains **scripts only**. It does not include disc images, clip art, fonts, or other recovered assets. Make sure you have the rights needed to use or distribute anything extracted from the CDs.
+This repository contains **scripts only**. It does not include disc images, clip art, fonts, or other recovered assets. The MIT License applies only to this repository's scripts and documentation; all extracted CD content remains subject to its original copyright and license terms. See [CONTENT_RIGHTS.md](CONTENT_RIGHTS.md).
 
 ## What it does
 
