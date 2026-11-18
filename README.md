@@ -69,7 +69,7 @@ The recovery set began with seven Provo Craft boxes found at an annual library b
 | All Occasions | `CD/all-occasions` | Annette Ward | August 1996 | 202 | 202 | `ALL OCCASIONS Normal.ttf` | Recovered. |
 | Garden Party | `CD/garden-party` | Rebecca Carter | August 1996 | 217 | 217 | `Garden Party Normal.ttf` | Recovered. |
 | Countryside Collection | `CD/countryside` | Kathy Distefano Griffiths | August 1996 | 215 | 215 | `Countryside Normal.ttf` | Recovered. |
-| Rebecca's Winter Weather | — | Rebecca Carter | August 1996 | — | — | — | Recovery running. |
+| Rebecca's Winter Weather | `CD/winter-weather` | Rebecca Carter | August 1996 | 216 | 216 | `Winter Weather Normal.ttf` | Recovered. |
 | Holidays | — | Annette Ward | August 1996 | — | — | — | Being processed. |
 
 ## What it does
