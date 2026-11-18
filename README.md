@@ -97,7 +97,7 @@ Other titles will be added only when a listing can be matched to the disc title 
    ├── contact-sheet-01.png
    ├── contact-sheet-02.png
    ├── ...
-   ├── <font name>.ttf            # when a Macintosh .suit is present
+   ├── <font name>.ttf
    ├── PNG/
    ├── SVG/
    ├── manifest.json
@@ -152,7 +152,3 @@ python3 scripts/recover_cd.py archive \
 ```bash
 python3 -m unittest discover -s tests -v
 ```
-
-## Status
-
-The initial workflow has been tested against the recovered **All Occasions** disc layout: 202 TIFF-to-1-bit-PNG conversions, 202 EPS-to-SVG conversions, direct Macintosh `.suit` to TTF conversion, and four packed contact sheets.
