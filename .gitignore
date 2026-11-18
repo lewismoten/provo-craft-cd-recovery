@@ -6,6 +6,7 @@ __pycache__/
 .DS_Store
 
 # Recovered media and generated asset folders
+CD/
 recovered/
 archives/
 *.cdr

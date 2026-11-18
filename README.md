@@ -10,7 +10,7 @@ The discs asked for what was then a serious workstation:
 
 | Platform | Original requirements |
 | --- | --- |
-| Windows | Windows 3.1 or later with TrueType support, **4 MB RAM**, **48 MB hard-disk space**, and a graphics program that supports TIFF |
+| Windows | Windows 3.1 or later with TrueType support, **4 MB RAM**, **4–8 MB hard-disk space**, and a graphics program that supports TIFF |
 | Macintosh | System 6 or later (System 7 recommended), **4–8 MB disk space**, **4–8 MB RAM**, and a graphics program that supports TIFF or EPS |
 
 In other words: this project turns media designed for a computer with less memory than a modern browser tab into files useful on a current Mac. The recovery scripts keep the original formats intact while producing GIF, SVG, modern TTF, and thumbnail contact-sheet derivatives.
@@ -36,6 +36,14 @@ In other words: this project turns media designed for a computer with less memor
    ```
 
 The root contact sheets use labeled 8×8 thumbnail grids. Labels show the source category folder and filename without the extension.
+
+For normal use, run the complete workflow instead:
+
+```bash
+python3 scripts/recover_cd.py recover
+```
+
+It detects the inserted CD-ROM drive, reads the classic-Mac HFS volume name, then writes the full result to `CD/<detected-disc-name>/`. That folder is Git-ignored and includes the raw archive in `archive/`, root-level contact sheets and converted TTF fonts, plus `GIF/` and `SVG/` directories.
 
 ## Requirements
 

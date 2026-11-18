@@ -16,6 +16,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import plistlib
 import re
 import shutil
 import subprocess
@@ -59,6 +60,14 @@ def run(command: list[str]) -> None:
         raise RuntimeError(f"Command failed: {' '.join(command[:2])}\n{detail}")
 
 
+def run_output(command: list[str]) -> str:
+    result = subprocess.run(command, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    if result.returncode:
+        detail = result.stderr.strip() or result.stdout.strip() or "unknown error"
+        raise RuntimeError(f"Command failed: {' '.join(command[:2])}\n{detail}")
+    return result.stdout
+
+
 def require_tool(name: str) -> None:
     if not shutil.which(name):
         raise RuntimeError(f"Required command not found: {name}")
@@ -78,6 +87,61 @@ def detect_optical_device() -> Path:
     if result.returncode:
         raise RuntimeError(result.stderr.strip() or "drutil status failed")
     return optical_device_from_drutil_status(result.stdout)
+
+
+def volume_name_from_hmount_output(output: str) -> str:
+    match = re.search(r'Volume name is "(.+?)"', output)
+    if not match:
+        raise RuntimeError("Could not determine the classic-Mac HFS volume name")
+    return match.group(1)
+
+
+def attach_hfs_iso(iso: Path) -> tuple[Path, Path]:
+    """Attach an ISO read-only and return (whole_disk, HFS_partition)."""
+    require_tool("hdiutil")
+    output = run_output(["hdiutil", "attach", "-readonly", "-nomount", "-plist", str(iso)])
+    entities = plistlib.loads(output.encode())["system-entities"]
+    whole = next((Path(entity["dev-entry"]) for entity in entities if entity.get("content-hint") == "Apple_partition_scheme"), None)
+    hfs = next((Path(entity["dev-entry"]) for entity in entities if entity.get("content-hint") == "Apple_HFS"), None)
+    if whole is None or hfs is None:
+        raise RuntimeError("Derived ISO does not contain an Apple HFS partition")
+    return whole, hfs
+
+
+def safe_asset_name(name: str) -> str:
+    return re.sub(r"[/:\\]", "-", name).strip() or "unnamed"
+
+
+def hfs_entries(path: str) -> list[str]:
+    run(["hcd", path])
+    return [entry for entry in run_output(["hls", "-1", "-N"]).splitlines() if entry]
+
+
+def extract_classic_hfs(hfs_device: Path, destination: Path) -> str:
+    """Export known Provo Craft asset folders from a read-only classic HFS image."""
+    for tool in ("hmount", "humount", "hcd", "hls", "hcopy"):
+        require_tool(tool)
+    destination.mkdir(parents=True, exist_ok=True)
+    mounted = False
+    try:
+        volume_name = volume_name_from_hmount_output(run_output(["hmount", str(hfs_device)]))
+        mounted = True
+        for source_folder, target_folder, extension in (("MAC TIFF", "TIFF", ".tiff"), ("MAC EPS", "EPS", ".eps")):
+            for category in hfs_entries(f"{volume_name}:{source_folder}"):
+                source_path = f"{volume_name}:{source_folder}:{category}"
+                target_dir = destination / target_folder / safe_asset_name(category)
+                target_dir.mkdir(parents=True, exist_ok=True)
+                for item in hfs_entries(source_path):
+                    target = target_dir / f"{safe_asset_name(item)}{extension}"
+                    run(["hcopy", "-r", item, str(target)])
+        font_dir = destination / "FONT (original Mac files)"
+        font_dir.mkdir(parents=True, exist_ok=True)
+        for item in hfs_entries(f"{volume_name}:FONT:MAC"):
+            run(["hcopy", "-m", item, str(font_dir / f"{safe_asset_name(item)}.bin")])
+        return volume_name
+    finally:
+        if mounted:
+            subprocess.run(["humount"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
 
 def find_files(root: Path, suffix: str) -> list[Path]:
@@ -224,6 +288,31 @@ def archive(device: Path, destination: Path) -> None:
     destination.with_suffix(destination.suffix + ".sha256").write_text(f"{checksum}  {destination.name}\n", encoding="utf-8")
 
 
+def recover_current_cd(destination: Path, overwrite: bool, device: Path | None = None) -> OutputLayout:
+    """Run the complete read-only capture, HFS extraction, and conversion workflow."""
+    device = device or detect_optical_device()
+    destination.mkdir(parents=True, exist_ok=True)
+    with tempfile.TemporaryDirectory(prefix="provo-craft-recover-") as temporary:
+        temp = Path(temporary)
+        raw_capture = temp / "disc.cdr"
+        archive(device, raw_capture)
+        iso = raw_capture.with_suffix(".iso")
+        whole_disk, hfs_partition = attach_hfs_iso(iso)
+        extracted = temp / "extracted"
+        try:
+            disc_name = extract_classic_hfs(hfs_partition, extracted)
+        finally:
+            run(["hdiutil", "detach", str(whole_disk)])
+        layout = build(extracted, destination, disc_name, None, overwrite)
+        archive_dir = layout.root / "archive"
+        archive_dir.mkdir(parents=True, exist_ok=True)
+        base = slugify(disc_name)
+        shutil.move(str(raw_capture), archive_dir / f"{base}.cdr")
+        shutil.move(str(iso), archive_dir / f"{base}.iso")
+        shutil.move(str(raw_capture.with_suffix(raw_capture.suffix + ".sha256")), archive_dir / f"{base}.cdr.sha256")
+        return layout
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     subparsers = parser.add_subparsers(dest="command", required=True)
@@ -236,14 +325,20 @@ def main() -> int:
     archive_parser = subparsers.add_parser("archive", help="auto-detect the current CD and make a raw Mode-1 archive plus derived ISO")
     archive_parser.add_argument("destination", type=Path, help="output .cdr path")
     archive_parser.add_argument("--device", type=Path, help="optional raw-device override, e.g. /dev/rdisk12")
+    recover_parser = subparsers.add_parser("recover", help="run the complete recovery workflow for the CD currently in the drive")
+    recover_parser.add_argument("destination", type=Path, nargs="?", default=Path("CD"), help="parent output directory (default: ./CD)")
+    recover_parser.add_argument("--device", type=Path, help="optional raw-device override, e.g. /dev/rdisk12")
+    recover_parser.add_argument("--overwrite", action="store_true", help="replace an existing folder with the same detected disc name")
     args = parser.parse_args()
     try:
         if args.command == "build":
             layout = build(args.source, args.destination, args.disc_name, args.font_name, args.overwrite)
             print(layout.root)
-        else:
+        elif args.command == "archive":
             archive(args.device or detect_optical_device(), args.destination)
             print(args.destination)
+        else:
+            print(recover_current_cd(args.destination, args.overwrite, args.device).root)
     except RuntimeError as error:
         print(f"error: {error}", file=sys.stderr)
         return 2

@@ -29,6 +29,10 @@ class OutputLayoutTests(unittest.TestCase):
 """
         self.assertEqual(recover_cd.optical_device_from_drutil_status(status), Path('/dev/rdisk12'))
 
+    def test_volume_name_from_hmount_output_uses_classic_hfs_name(self):
+        output = 'Volume name is "All Occasions" (locked)\nVolume has 91815936 bytes free\n'
+        self.assertEqual(recover_cd.volume_name_from_hmount_output(output), 'All Occasions')
+
 
 if __name__ == "__main__":
     unittest.main()
