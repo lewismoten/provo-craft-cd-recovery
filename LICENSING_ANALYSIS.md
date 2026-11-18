@@ -8,6 +8,12 @@ The license is part of the historical record. It describes a late-1990s model in
 
 The recovered discs are still governed by their original content terms. This repository therefore publishes recovery scripts and documentation only—not disc images, artwork, fonts, contact sheets, or other recovered output.
 
+## A license written for an uncertain transition
+
+In the lead-up to widespread consumer internet adoption, many publishers and authors were concerned that their work could suddenly reach a mass audience without compensation. The technology and its social norms were new, and there were few settled consumer precedents for online distribution at that scale.
+
+This license reflects that caution. Its limits make sense as an attempt to preserve a CD-ROM-era market, but they are much more restrictive than the sharing, backup, synchronization, and multi-device use that many households now treat as ordinary computing. That historical context explains the tension; it does not override the printed terms.
+
 ## The recurring restrictions
 
 The manuals say that the designs and fonts are licensed rather than freely transferable. In plain language, the recurring terms say:
