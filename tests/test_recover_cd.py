@@ -15,7 +15,7 @@ class OutputLayoutTests(unittest.TestCase):
         layout = recover_cd.output_layout(Path("/archive"), "All Occasions")
 
         self.assertEqual(layout.root, Path("/archive/all-occasions"))
-        self.assertEqual(layout.gif_dir, layout.root / "GIF")
+        self.assertEqual(layout.png_dir, layout.root / "PNG")
         self.assertEqual(layout.svg_dir, layout.root / "SVG")
         self.assertEqual(layout.font_path("Birthday Fun"), layout.root / "Birthday Fun.ttf")
         self.assertEqual(layout.contact_sheet(1), layout.root / "contact-sheet-01.png")

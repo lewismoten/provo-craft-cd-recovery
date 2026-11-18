@@ -13,7 +13,7 @@ The discs asked for what was then a serious workstation:
 | Windows | Windows 3.1 or later with TrueType support, **4 MB RAM**, **4–8 MB hard-disk space**, and a graphics program that supports TIFF |
 | Macintosh | System 6 or later (System 7 recommended), **4–8 MB disk space**, **4–8 MB RAM**, and a graphics program that supports TIFF or EPS |
 
-In other words: this project turns media designed for a computer with less memory than a modern browser tab into files useful on a current Mac. The recovery scripts keep the original formats intact while producing GIF, SVG, modern TTF, and thumbnail contact-sheet derivatives.
+In other words: this project turns media designed for a computer with less memory than a modern browser tab into files useful on a current Mac. The recovery scripts keep the original formats intact while producing low-depth PNG, SVG, modern TTF, and thumbnail contact-sheet derivatives.
 
 ## Compatibility notes from the manuals
 
@@ -26,7 +26,7 @@ The manuals were frank that these CDs were **not easily DOS-compatible**. Their 
 
 The manuals named a period software shelf that included QuarkXPress, WordPerfect 5.0+, Microsoft Word 5.0+, ClarisWorks, CorelDRAW! 4.0+, Draw 4.0, Aldus PhotoStyler, Adobe Photoshop, Adobe Illustrator 3.0, Microsoft Works 4.0, Aldus PageMaker 4.0+, Print Artist 3.0+, The Print Shop Deluxe/II/III, and Adobe PhotoDeluxe.
 
-This project leans into that history while widening compatibility for current software: TIFF artwork becomes compact GIF files, EPS becomes standalone SVG, readable Macintosh `.suit` resources become modern TTFs, and contact sheets make the recovered collection browsable without booting Windows 3.1 or System 7.
+This project leans into that history while widening compatibility for current software: TIFF artwork becomes compressed 1-bit PNG files, EPS becomes standalone SVG, readable Macintosh `.suit` resources become modern TTFs, and contact sheets make the recovered collection browsable without booting Windows 3.1 or System 7.
 
 ## Acquisition story
 
@@ -47,7 +47,7 @@ The recovery set began with seven Provo Craft boxes found at an annual library b
    ├── contact-sheet-02.png
    ├── ...
    ├── <font name>.ttf            # when a Macintosh .suit is present
-   ├── GIF/
+   ├── PNG/
    ├── SVG/
    ├── manifest.json
    └── README.txt
@@ -61,7 +61,7 @@ For normal use, run the complete workflow instead:
 python3 scripts/recover_cd.py recover
 ```
 
-It detects the inserted CD-ROM drive, reads the classic-Mac HFS volume name, then writes the full result to `CD/<detected-disc-name>/`. Every major step and conversion batch is printed as it runs; raw capture also exposes `dd` progress while the CD spins. That folder is Git-ignored and includes the raw archive in `archive/`, root-level contact sheets and converted TTF fonts, plus `GIF/` and `SVG/` directories.
+It detects the inserted CD-ROM drive, reads the classic-Mac HFS volume name, then writes the full result to `CD/<detected-disc-name>/`. Every major step and conversion batch is printed as it runs; raw capture also exposes `dd` progress while the CD spins. That folder is Git-ignored and includes the raw archive in `archive/`, root-level contact sheets and converted TTF fonts, plus `PNG/` and `SVG/` directories. Re-running it fingerprints the inserted disc, finds any matching local archive, and skips archive, image, font, SVG, and contact-sheet files that already exist.
 
 ## Requirements
 
@@ -112,4 +112,4 @@ python3 -m unittest discover -s tests -v
 
 ## Status
 
-The initial workflow has been tested against the recovered **All Occasions** disc layout: 202 TIFF-to-GIF conversions, 202 EPS-to-SVG conversions, direct Macintosh `.suit` to TTF conversion, and four packed contact sheets.
+The initial workflow has been tested against the recovered **All Occasions** disc layout: 202 TIFF-to-1-bit-PNG conversions, 202 EPS-to-SVG conversions, direct Macintosh `.suit` to TTF conversion, and four packed contact sheets.

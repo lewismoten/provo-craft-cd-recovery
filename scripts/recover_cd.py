@@ -7,7 +7,7 @@ TIFF/, EPS/, and optionally FONT (original Mac files)/*.suit.bin. It creates:
 <output>/<disc-slug>/
   contact-sheet-01.png ...
   <font name>.ttf                (when a .suit font is present)
-  GIF/
+  PNG/
   SVG/
   manifest.json
 """
@@ -36,7 +36,7 @@ def announce(message: str) -> None:
 @dataclass(frozen=True)
 class OutputLayout:
     root: Path
-    gif_dir: Path
+    png_dir: Path
     svg_dir: Path
 
     def contact_sheet(self, number: int) -> Path:
@@ -54,7 +54,7 @@ def slugify(value: str) -> str:
 
 def output_layout(destination: Path, disc_name: str) -> OutputLayout:
     root = destination / slugify(disc_name)
-    return OutputLayout(root=root, gif_dir=root / "GIF", svg_dir=root / "SVG")
+    return OutputLayout(root=root, png_dir=root / "PNG", svg_dir=root / "SVG")
 
 
 def run(command: list[str]) -> None:
@@ -164,19 +164,20 @@ def find_files(root: Path, suffix: str) -> list[Path]:
     return sorted(path for path in root.rglob(f"*{suffix}") if path.is_file())
 
 
-def copy_as_gif(source_root: Path, layout: OutputLayout) -> list[dict[str, str]]:
+def copy_as_png(source_root: Path, layout: OutputLayout) -> list[dict[str, str]]:
     require_tool("magick")
     sources = find_files(source_root / "TIFF", ".tiff")
-    announce(f"Converting {len(sources)} TIFF files to 2-color GIF")
+    announce(f"Converting {len(sources)} TIFF files to 1-bit PNG")
     records: list[dict[str, str]] = []
     for number, source in enumerate(sources, 1):
-        target = (layout.gif_dir / source.relative_to(source_root / "TIFF")).with_suffix(".gif")
+        target = (layout.png_dir / source.relative_to(source_root / "TIFF")).with_suffix(".png")
         target.parent.mkdir(parents=True, exist_ok=True)
-        # The recovered TIFF artwork is 1-bit; keep GIF palette minimal.
-        run(["magick", str(source), "-type", "Bilevel", "-colors", "2", str(target)])
+        # The recovered TIFF artwork is 1-bit; retain it as a compressed 1-bit PNG.
+        if not target.exists():
+            run(["magick", str(source), "-type", "Bilevel", "-depth", "1", "-define", "png:color-type=0", "-define", "png:bit-depth=1", "-compress", "Zip", str(target)])
         records.append({"source": str(source.relative_to(source_root)), "output": str(target.relative_to(layout.root))})
         if number % 25 == 0 or number == len(sources):
-            announce(f"  GIF {number}/{len(sources)}")
+            announce(f"  PNG {number}/{len(sources)}")
     return records
 
 
@@ -188,7 +189,8 @@ def copy_as_svg(source_root: Path, layout: OutputLayout) -> list[dict[str, str]]
     for number, source in enumerate(sources, 1):
         target = (layout.svg_dir / source.relative_to(source_root / "EPS")).with_suffix(".svg")
         target.parent.mkdir(parents=True, exist_ok=True)
-        run(["pstoedit", "-f", "svg:-standalone", str(source), str(target)])
+        if not target.exists():
+            run(["pstoedit", "-f", "svg:-standalone", str(source), str(target)])
         records.append({"source": str(source.relative_to(source_root)), "output": str(target.relative_to(layout.root))})
         if number % 25 == 0 or number == len(sources):
             announce(f"  SVG {number}/{len(sources)}")
@@ -220,6 +222,9 @@ def convert_suitcase(source_root: Path, layout: OutputLayout, font_name: str | N
     require_tool("fontforge")
     resolved_name = font_name or font_name_from_suitcase(suitcase)
     target = layout.font_path(resolved_name)
+    if target.exists():
+        announce(f'Skipping existing font "{target.name}"')
+        return {"source": str(suitcase.relative_to(source_root)), "output": str(target.relative_to(layout.root))}
     announce(f'Converting Macintosh suitcase "{suitcase.name}" to "{target.name}"')
     postscript_name = re.sub(r"[^A-Za-z0-9]", "", resolved_name) or "RecoveredFont"
     code = (
@@ -235,13 +240,17 @@ def convert_suitcase(source_root: Path, layout: OutputLayout, font_name: str | N
 
 def create_contact_sheets(layout: OutputLayout, columns: int = 8, rows: int = 8) -> list[str]:
     require_tool("magick")
-    sources = find_files(layout.gif_dir, ".gif")
+    sources = find_files(layout.png_dir, ".png")
     if not sources:
         return []
     if not Path(ARIAL).is_file():
         raise RuntimeError(f"Required label font is missing: {ARIAL}")
-    announce(f"Creating labeled {columns}x{rows} contact sheets for {len(sources)} GIF files")
+    announce(f"Creating labeled {columns}x{rows} contact sheets for {len(sources)} PNG files")
     per_sheet = columns * rows
+    expected_sheets = [layout.contact_sheet(page) for page in range(1, (len(sources) + per_sheet - 1) // per_sheet + 1)]
+    if all(sheet.exists() for sheet in expected_sheets):
+        announce("  Skipping existing contact sheets")
+        return [sheet.name for sheet in expected_sheets]
     names: list[str] = []
     with tempfile.TemporaryDirectory(prefix="provo-craft-cells-") as temp:
         tempdir = Path(temp)
@@ -262,9 +271,13 @@ def create_contact_sheets(layout: OutputLayout, columns: int = 8, rows: int = 8)
             # Last page shrinks to fit rather than adding blank contact cells.
             page_rows = min(rows, (len(group) + columns - 1) // columns)
             target = layout.contact_sheet(page)
-            run(["magick", "montage", *map(str, group), "-tile", f"{columns}x{page_rows}", "-geometry", "256x256+0+0", "-background", "white", str(target)])
+            existed = target.exists()
+            if not existed:
+                assembled = tempdir / f"sheet-{page}.png"
+                run(["magick", "montage", *map(str, group), "-tile", f"{columns}x{page_rows}", "-geometry", "256x256+0+0", "-background", "white", str(assembled)])
+                run(["magick", str(assembled), "-colorspace", "Gray", "-dither", "None", "-colors", "7", "-depth", "8", "-strip", "-compress", "Zip", str(target)])
             names.append(target.name)
-            announce(f"  Wrote {target.name}")
+            announce(f"  {'Kept existing' if existed else 'Wrote'} {target.name}")
     return names
 
 
@@ -272,21 +285,19 @@ def build(source: Path, destination: Path, disc_name: str, font_name: str | None
     if not source.is_dir():
         raise RuntimeError(f"Source directory does not exist: {source}")
     layout = output_layout(destination, disc_name)
-    if layout.root.exists() and not overwrite:
-        raise RuntimeError(f"Output already exists: {layout.root} (use --overwrite to replace it)")
-    if layout.root.exists():
+    if layout.root.exists() and overwrite:
         shutil.rmtree(layout.root)
-    announce(f'Building modern assets for "{disc_name}" in {layout.root}')
-    layout.gif_dir.mkdir(parents=True)
-    layout.svg_dir.mkdir(parents=True)
-    gifs = copy_as_gif(source, layout)
+    announce(f'Building modern assets for "{disc_name}" in {layout.root} (existing files will be skipped)')
+    layout.png_dir.mkdir(parents=True, exist_ok=True)
+    layout.svg_dir.mkdir(parents=True, exist_ok=True)
+    pngs = copy_as_png(source, layout)
     svgs = copy_as_svg(source, layout)
     font = convert_suitcase(source, layout, font_name)
     sheets = create_contact_sheets(layout)
     manifest = {
         "disc_name": disc_name,
         "source": str(source.resolve()),
-        "outputs": {"gif": gifs, "svg": svgs, "font": font, "contact_sheets": sheets},
+        "outputs": {"png": pngs, "svg": svgs, "font": font, "contact_sheets": sheets},
     }
     (layout.root / "manifest.json").write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
     (layout.root / "README.txt").write_text(
@@ -297,28 +308,62 @@ def build(source: Path, destination: Path, disc_name: str, font_name: str | None
     return layout
 
 
+FINGERPRINT_SECTORS = 256
+
+
+def fingerprint_bytes(data: bytes) -> str:
+    return hashlib.sha256(data).hexdigest()
+
+
+def fingerprint_device(device: Path) -> str:
+    result = subprocess.run(["dd", f"if={device}", "bs=2352", f"count={FINGERPRINT_SECTORS}"], stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
+    if result.returncode:
+        raise RuntimeError(f"Unable to read optical-media fingerprint from {device}")
+    return fingerprint_bytes(result.stdout)
+
+
+def find_matching_archive(destination: Path, fingerprint: str) -> Path | None:
+    for candidate in destination.glob("*/archive/*.cdr"):
+        with candidate.open("rb") as captured:
+            if fingerprint_bytes(captured.read(2352 * FINGERPRINT_SECTORS)) == fingerprint:
+                return candidate
+    return None
+
+
 def archive(device: Path, destination: Path) -> None:
     """Preserve a Mode-1 optical disc as raw 2352-byte sectors plus derived ISO."""
     require_tool("dd")
-    if destination.exists():
-        raise RuntimeError(f"Refusing to overwrite: {destination}")
-    announce(f"Capturing raw CD sectors from {device} to {destination}")
-    announce("  Reading the disc now; dd progress will update while the CD spins.")
-    run_live(["dd", f"if={device}", f"of={destination}", "bs=2352", "status=progress"])
-    announce("Deriving a 2048-byte-sector ISO from the raw capture")
-    raw = destination.read_bytes()
-    if len(raw) % 2352:
-        raise RuntimeError("Raw capture is not an integer number of 2352-byte sectors")
     iso = destination.with_suffix(".iso")
-    with iso.open("wb") as output:
-        for offset in range(0, len(raw), 2352):
-            sector = raw[offset : offset + 2352]
-            if sector[:12] != b"\0" + b"\xff" * 10 + b"\0" or sector[15] != 1:
-                raise RuntimeError(f"Unexpected Mode-1 sector framing at sector {offset // 2352}")
-            output.write(sector[16:2064])
-    checksum = hashlib.sha256(raw).hexdigest()
-    destination.with_suffix(destination.suffix + ".sha256").write_text(f"{checksum}  {destination.name}\n", encoding="utf-8")
-    announce("Wrote raw archive, derived ISO, and SHA-256 checksum")
+    checksum_path = destination.with_suffix(destination.suffix + ".sha256")
+    if destination.exists():
+        announce(f"Skipping existing raw archive: {destination}")
+    else:
+        announce(f"Capturing raw CD sectors from {device} to {destination}")
+        announce("  Reading the disc now; dd progress will update while the CD spins.")
+        run_live(["dd", f"if={device}", f"of={destination}", "bs=2352", "status=progress"])
+    raw: bytes | None = None
+    if not iso.exists() or not checksum_path.exists():
+        raw = destination.read_bytes()
+        if len(raw) % 2352:
+            raise RuntimeError("Raw capture is not an integer number of 2352-byte sectors")
+    if iso.exists():
+        announce(f"Skipping existing derived ISO: {iso}")
+    else:
+        announce("Deriving a 2048-byte-sector ISO from the raw capture")
+        with iso.open("wb") as output:
+            assert raw is not None
+            for offset in range(0, len(raw), 2352):
+                sector = raw[offset : offset + 2352]
+                if sector[:12] != b"\0" + b"\xff" * 10 + b"\0" or sector[15] != 1:
+                    raise RuntimeError(f"Unexpected Mode-1 sector framing at sector {offset // 2352}")
+                output.write(sector[16:2064])
+    if checksum_path.exists():
+        announce(f"Skipping existing checksum: {checksum_path}")
+    else:
+        assert raw is not None
+        checksum = hashlib.sha256(raw).hexdigest()
+        checksum_path.write_text(f"{checksum}  {destination.name}\n", encoding="utf-8")
+    announce("Archive is ready")
 
 
 def recover_current_cd(destination: Path, overwrite: bool, device: Path | None = None) -> OutputLayout:
@@ -326,11 +371,19 @@ def recover_current_cd(destination: Path, overwrite: bool, device: Path | None =
     device = device or detect_optical_device()
     announce(f"Detected optical drive: {device}")
     destination.mkdir(parents=True, exist_ok=True)
+    announce("Reading a small disc fingerprint to find resumable work")
+    existing_archive = find_matching_archive(destination, fingerprint_device(device))
     with tempfile.TemporaryDirectory(prefix="provo-craft-recover-") as temporary:
         temp = Path(temporary)
-        raw_capture = temp / "disc.cdr"
-        archive(device, raw_capture)
-        iso = raw_capture.with_suffix(".iso")
+        if existing_archive:
+            announce(f"Found matching prior archive: {existing_archive}")
+            raw_capture = existing_archive
+            iso = existing_archive.with_suffix(".iso")
+            archive(device, raw_capture)
+        else:
+            raw_capture = temp / "disc.cdr"
+            archive(device, raw_capture)
+            iso = raw_capture.with_suffix(".iso")
         announce("Attaching the derived ISO read-only")
         whole_disk, hfs_partition = attach_hfs_iso(iso)
         extracted = temp / "extracted"
@@ -340,6 +393,9 @@ def recover_current_cd(destination: Path, overwrite: bool, device: Path | None =
             announce("Detaching the read-only ISO")
             run(["hdiutil", "detach", str(whole_disk)])
         layout = build(extracted, destination, disc_name, None, overwrite)
+        if existing_archive:
+            announce(f"Recovery complete: {layout.root}")
+            return layout
         archive_dir = layout.root / "archive"
         archive_dir.mkdir(parents=True, exist_ok=True)
         base = slugify(disc_name)
@@ -353,7 +409,7 @@ def recover_current_cd(destination: Path, overwrite: bool, device: Path | None =
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     subparsers = parser.add_subparsers(dest="command", required=True)
-    build_parser = subparsers.add_parser("build", help="convert an extracted CD folder into GIF, SVG, TTF, and contact sheets")
+    build_parser = subparsers.add_parser("build", help="convert an extracted CD folder into low-depth PNG, SVG, TTF, and contact sheets")
     build_parser.add_argument("source", type=Path, help="extracted CD folder containing TIFF/, EPS/, and optional FONT folders")
     build_parser.add_argument("destination", type=Path, help="parent folder for the generated per-CD folder")
     build_parser.add_argument("--disc-name", required=True)
