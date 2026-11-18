@@ -1,0 +1,16 @@
+# Python
+__pycache__/
+*.py[cod]
+
+# macOS
+.DS_Store
+
+# Recovered media and generated asset folders
+recovered/
+archives/
+*.cdr
+*.iso
+*.sha256
+
+# Local contact-sheet work files
+.provo-craft-work/
