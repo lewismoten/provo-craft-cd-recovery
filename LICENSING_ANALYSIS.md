@@ -4,7 +4,7 @@
 
 ## Why preserve this language?
 
-The license is part of the historical record. It describes a late-1990s model in which clip art lived on one physical CD-ROM, a household commonly used one desktop computer, local networks were comparatively unusual, and the World Wide Web was not an everyday publishing channel for most families.
+The license is part of the historical record. It describes a late-1990s model in which clip art lived on one physical CD-ROM, a household commonly used one desktop computer, and local networks were comparatively unusual. Bulletin board systems (BBSs), online services, and early consumer internet access were already familiar ways to exchange files, while the Web was beginning to reach a much broader public than it had earlier in the decade.
 
 The recovered discs are still governed by their original content terms. This repository therefore publishes recovery scripts and documentation only—not disc images, artwork, fonts, contact sheets, or other recovered output.
 
