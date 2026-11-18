@@ -110,7 +110,7 @@ class OutputLayoutTests(unittest.TestCase):
             recover_cd.find_matching_archive = lambda destination, fingerprint: None
             recover_cd.archive = lambda device, destination: None
             recover_cd.attach_hfs_iso = lambda iso: (Path('/dev/disk99'), Path('/dev/disk99s2'))
-            recover_cd.extract_classic_hfs = lambda hfs, destination: (_ for _ in ()).throw(RuntimeError('unexpected layout'))
+            recover_cd.extract_classic_hfs = lambda hfs, destination, on_volume_open=None: (_ for _ in ()).throw(RuntimeError('unexpected layout'))
             recover_cd.run = lambda command: None
             recover_cd.eject_optical_disc = calls.append
             with tempfile.TemporaryDirectory() as temporary:
@@ -121,6 +121,26 @@ class OutputLayoutTests(unittest.TestCase):
                 setattr(recover_cd, name, original)
 
         self.assertEqual(calls, [Path('/dev/rdisk12')])
+
+    def test_store_archive_moves_all_completed_artifacts_before_extraction(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            temporary_path = Path(temporary)
+            raw = temporary_path / 'disc.cdr'
+            iso = temporary_path / 'disc.iso'
+            checksum = temporary_path / 'disc.cdr.sha256'
+            raw.write_bytes(b'raw')
+            iso.write_bytes(b'iso')
+            checksum.write_text('checksum\n', encoding='utf-8')
+
+            layout = recover_cd.store_archive(raw, temporary_path / 'CD', 'Holidays')
+
+            self.assertEqual(layout.root, temporary_path / 'CD' / 'holidays')
+            self.assertTrue((layout.root / 'archive' / 'holidays.cdr').is_file())
+            self.assertTrue((layout.root / 'archive' / 'holidays.iso').is_file())
+            self.assertTrue((layout.root / 'archive' / 'holidays.cdr.sha256').is_file())
+            self.assertFalse(raw.exists())
+            self.assertFalse(iso.exists())
+            self.assertFalse(checksum.exists())
 
 
 if __name__ == "__main__":

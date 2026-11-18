@@ -22,6 +22,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+from collections.abc import Callable
 from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Iterable
@@ -144,7 +145,11 @@ def font_folder_candidates(volume_name: str) -> list[str]:
     return [f"{volume_name}:FONT:MAC", f"{volume_name}:MAC FONT"]
 
 
-def extract_classic_hfs(hfs_device: Path, destination: Path) -> str:
+def extract_classic_hfs(
+    hfs_device: Path,
+    destination: Path,
+    on_volume_open: Callable[[str], None] | None = None,
+) -> str:
     """Export known Provo Craft asset folders from a read-only classic HFS image."""
     for tool in ("hmount", "humount", "hcd", "hls", "hcopy"):
         require_tool(tool)
@@ -154,6 +159,8 @@ def extract_classic_hfs(hfs_device: Path, destination: Path) -> str:
         volume_name = volume_name_from_hmount_output(run_output(["hmount", str(hfs_device)]))
         mounted = True
         announce(f'Opened classic HFS volume: "{volume_name}"')
+        if on_volume_open is not None:
+            on_volume_open(volume_name)
         for source_folder, target_folder, extension in (("MAC TIFF", "TIFF", ".tiff"), ("MAC EPS", "EPS", ".eps")):
             announce(f"Extracting {source_folder} into {target_folder}/")
             for category in hfs_entries(f"{volume_name}:{source_folder}"):
@@ -420,6 +427,27 @@ def archive(device: Path, destination: Path) -> None:
     announce("Archive is ready")
 
 
+def store_archive(raw_capture: Path, destination: Path, disc_name: str) -> OutputLayout:
+    """Move a complete capture beside its disc output before asset extraction."""
+    layout = output_layout(destination, disc_name)
+    archive_dir = layout.root / "archive"
+    archive_dir.mkdir(parents=True, exist_ok=True)
+    base = slugify(disc_name)
+    artifacts = {
+        raw_capture: archive_dir / f"{base}.cdr",
+        raw_capture.with_suffix(".iso"): archive_dir / f"{base}.iso",
+        raw_capture.with_suffix(raw_capture.suffix + ".sha256"): archive_dir / f"{base}.cdr.sha256",
+    }
+    for source, target in artifacts.items():
+        if not source.is_file():
+            raise RuntimeError(f"Completed archive artifact is missing: {source}")
+        if target.exists():
+            raise RuntimeError(f"Archive destination already exists: {target}")
+    for source, target in artifacts.items():
+        shutil.move(str(source), target)
+    return layout
+
+
 def _recover_current_cd(device: Path, destination: Path, overwrite: bool) -> OutputLayout:
     """Run the complete read-only capture, HFS extraction, and conversion workflow."""
     announce(f"Detected optical drive: {device}")
@@ -440,19 +468,21 @@ def _recover_current_cd(device: Path, destination: Path, overwrite: bool) -> Out
         announce("Attaching the derived ISO read-only")
         whole_disk, hfs_partition = attach_hfs_iso(iso)
         extracted = temp / "extracted"
+        stored_layout: OutputLayout | None = None
+
+        def store_completed_archive(disc_name: str) -> None:
+            nonlocal stored_layout
+            if not existing_archive:
+                stored_layout = store_archive(raw_capture, destination, disc_name)
+
         try:
-            disc_name = extract_classic_hfs(hfs_partition, extracted)
+            disc_name = extract_classic_hfs(hfs_partition, extracted, store_completed_archive)
         finally:
             announce("Detaching the read-only ISO")
             run(["hdiutil", "detach", str(whole_disk)])
         layout = build(extracted, destination, disc_name, None, overwrite)
-        if not existing_archive:
-            archive_dir = layout.root / "archive"
-            archive_dir.mkdir(parents=True, exist_ok=True)
-            base = slugify(disc_name)
-            shutil.move(str(raw_capture), archive_dir / f"{base}.cdr")
-            shutil.move(str(iso), archive_dir / f"{base}.iso")
-            shutil.move(str(raw_capture.with_suffix(raw_capture.suffix + ".sha256")), archive_dir / f"{base}.cdr.sha256")
+        if stored_layout is not None and layout.root != stored_layout.root:
+            raise RuntimeError("Archive and generated output resolved to different disc folders")
         announce(f"Recovery complete: {layout.root}")
         return layout
 
