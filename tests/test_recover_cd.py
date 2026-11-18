@@ -59,6 +59,28 @@ class OutputLayoutTests(unittest.TestCase):
         self.assertEqual(commands, [['diskutil', 'eject', '/dev/disk12']])
         self.assertEqual(stream.getvalue(), 'Ejecting CD: /dev/disk12\n')
 
+    def test_png_conversion_command_preserves_transparent_white_background(self):
+        command = recover_cd.png_conversion_command(Path('artwork.tiff'), Path('artwork.png'))
+
+        self.assertEqual(command, [
+            'magick', 'artwork.tiff', '-transparent', 'white', '-depth', '1',
+            '-strip', '-compress', 'Zip', 'artwork.png',
+        ])
+
+    def test_raw_capture_command_reads_multiple_raw_sectors_per_io(self):
+        command = recover_cd.raw_capture_command(Path('/dev/rdisk12'), Path('disc.cdr'))
+
+        self.assertEqual(command, [
+            'dd', 'if=/dev/rdisk12', 'of=disc.cdr', 'bs=301056', 'status=progress',
+        ])
+
+    def test_fingerprint_command_reads_aligned_sector_batches(self):
+        command = recover_cd.fingerprint_command(Path('/dev/rdisk12'))
+
+        self.assertEqual(command, [
+            'dd', 'if=/dev/rdisk12', 'bs=301056', 'count=2',
+        ])
+
 
 if __name__ == "__main__":
     unittest.main()

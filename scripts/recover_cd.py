@@ -173,6 +173,14 @@ def find_files(root: Path, suffix: str) -> list[Path]:
     return sorted(path for path in root.rglob(f"*{suffix}") if path.is_file())
 
 
+def png_conversion_command(source: Path, target: Path) -> list[str]:
+    """Convert black-on-white legacy TIFF art into a compact transparent PNG."""
+    return [
+        "magick", str(source), "-transparent", "white", "-depth", "1",
+        "-strip", "-compress", "Zip", str(target),
+    ]
+
+
 def copy_as_png(source_root: Path, layout: OutputLayout) -> list[dict[str, str]]:
     require_tool("magick")
     sources = find_files(source_root / "TIFF", ".tiff")
@@ -183,7 +191,7 @@ def copy_as_png(source_root: Path, layout: OutputLayout) -> list[dict[str, str]]
         target.parent.mkdir(parents=True, exist_ok=True)
         # The recovered TIFF artwork is 1-bit; retain it as a compressed 1-bit PNG.
         if not target.exists():
-            run(["magick", str(source), "-type", "Bilevel", "-depth", "1", "-define", "png:color-type=0", "-define", "png:bit-depth=1", "-compress", "Zip", str(target)])
+            run(png_conversion_command(source, target))
         records.append({"source": str(source.relative_to(source_root)), "output": str(target.relative_to(layout.root))})
         if number % 25 == 0 or number == len(sources):
             announce(f"  PNG {number}/{len(sources)}")
@@ -317,7 +325,24 @@ def build(source: Path, destination: Path, disc_name: str, font_name: str | None
     return layout
 
 
+RAW_SECTOR_BYTES = 2352
+CAPTURE_BLOCK_SECTORS = 128
 FINGERPRINT_SECTORS = 256
+
+
+def raw_capture_command(device: Path, destination: Path) -> list[str]:
+    """Read a batch of complete raw sectors per I/O without altering bytes."""
+    return [
+        "dd", f"if={device}", f"of={destination}",
+        f"bs={RAW_SECTOR_BYTES * CAPTURE_BLOCK_SECTORS}", "status=progress",
+    ]
+
+
+def fingerprint_command(device: Path) -> list[str]:
+    batches = (FINGERPRINT_SECTORS + CAPTURE_BLOCK_SECTORS - 1) // CAPTURE_BLOCK_SECTORS
+    return [
+        "dd", f"if={device}", f"bs={RAW_SECTOR_BYTES * CAPTURE_BLOCK_SECTORS}", f"count={batches}",
+    ]
 
 
 def fingerprint_bytes(data: bytes) -> str:
@@ -325,10 +350,11 @@ def fingerprint_bytes(data: bytes) -> str:
 
 
 def fingerprint_device(device: Path) -> str:
-    result = subprocess.run(["dd", f"if={device}", "bs=2352", f"count={FINGERPRINT_SECTORS}"], stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
-    if result.returncode:
+    expected_bytes = RAW_SECTOR_BYTES * FINGERPRINT_SECTORS
+    result = subprocess.run(fingerprint_command(device), stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
+    if result.returncode or len(result.stdout) < expected_bytes:
         raise RuntimeError(f"Unable to read optical-media fingerprint from {device}")
-    return fingerprint_bytes(result.stdout)
+    return fingerprint_bytes(result.stdout[:expected_bytes])
 
 
 def find_matching_archive(destination: Path, fingerprint: str) -> Path | None:
@@ -349,7 +375,7 @@ def archive(device: Path, destination: Path) -> None:
     else:
         announce(f"Capturing raw CD sectors from {device} to {destination}")
         announce("  Reading the disc now; dd progress will update while the CD spins.")
-        run_live(["dd", f"if={device}", f"of={destination}", "bs=2352", "status=progress"])
+        run_live(raw_capture_command(device, destination))
     raw: bytes | None = None
     if not iso.exists() or not checksum_path.exists():
         raw = destination.read_bytes()

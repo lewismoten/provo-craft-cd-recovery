@@ -44,7 +44,7 @@ The manuals were frank that these CDs were **not easily DOS-compatible**. Their 
 
 The manuals named a period software shelf that included QuarkXPress, WordPerfect 5.0+, Microsoft Word 5.0+, ClarisWorks, CorelDRAW! 4.0+, Draw 4.0, Aldus PhotoStyler, Adobe Photoshop, Adobe Illustrator 3.0, Microsoft Works 4.0, Aldus PageMaker 4.0+, Print Artist 3.0+, The Print Shop Deluxe/II/III, and Adobe PhotoDeluxe.
 
-This project leans into that history while widening compatibility for current software: TIFF artwork becomes compressed 1-bit PNG files, EPS becomes standalone SVG, readable Macintosh `.suit` resources become modern TTFs, and contact sheets make the recovered collection browsable without flipping through the manuals' dead trees.
+This project leans into that history while widening compatibility for current software: TIFF artwork becomes compressed 1-bit PNG files with white backgrounds made transparent, EPS becomes standalone SVG, readable Macintosh `.suit` resources become modern TTFs, and contact sheets make the recovered collection browsable without flipping through the manuals' dead trees.
 
 ## Acquisition story
 
