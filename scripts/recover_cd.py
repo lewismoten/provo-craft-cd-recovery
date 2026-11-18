@@ -420,9 +420,8 @@ def archive(device: Path, destination: Path) -> None:
     announce("Archive is ready")
 
 
-def recover_current_cd(destination: Path, overwrite: bool, device: Path | None = None) -> OutputLayout:
+def _recover_current_cd(device: Path, destination: Path, overwrite: bool) -> OutputLayout:
     """Run the complete read-only capture, HFS extraction, and conversion workflow."""
-    device = device or detect_optical_device()
     announce(f"Detected optical drive: {device}")
     destination.mkdir(parents=True, exist_ok=True)
     announce("Reading a small disc fingerprint to find resumable work")
@@ -455,8 +454,19 @@ def recover_current_cd(destination: Path, overwrite: bool, device: Path | None =
             shutil.move(str(iso), archive_dir / f"{base}.iso")
             shutil.move(str(raw_capture.with_suffix(raw_capture.suffix + ".sha256")), archive_dir / f"{base}.cdr.sha256")
         announce(f"Recovery complete: {layout.root}")
-        eject_optical_disc(device)
         return layout
+
+
+def recover_current_cd(destination: Path, overwrite: bool, device: Path | None = None) -> OutputLayout:
+    """Recover the current disc and release the optical drive on either outcome."""
+    device = device or detect_optical_device()
+    try:
+        return _recover_current_cd(device, destination, overwrite)
+    finally:
+        try:
+            eject_optical_disc(device)
+        except RuntimeError as error:
+            announce(f"Unable to eject CD: {error}")
 
 
 def main() -> int:

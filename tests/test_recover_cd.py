@@ -1,6 +1,7 @@
 import importlib.util
 import io
 import sys
+import tempfile
 import unittest
 from contextlib import redirect_stdout
 from pathlib import Path
@@ -92,6 +93,34 @@ class OutputLayoutTests(unittest.TestCase):
             recover_cd.font_folder_candidates('Garden Party'),
             ['Garden Party:FONT:MAC', 'Garden Party:MAC FONT'],
         )
+
+    def test_recovery_ejects_the_disc_after_an_extraction_failure(self):
+        calls: list[Path] = []
+        originals = {
+            'fingerprint_device': recover_cd.fingerprint_device,
+            'find_matching_archive': recover_cd.find_matching_archive,
+            'archive': recover_cd.archive,
+            'attach_hfs_iso': recover_cd.attach_hfs_iso,
+            'extract_classic_hfs': recover_cd.extract_classic_hfs,
+            'run': recover_cd.run,
+            'eject_optical_disc': recover_cd.eject_optical_disc,
+        }
+        try:
+            recover_cd.fingerprint_device = lambda device: 'fingerprint'
+            recover_cd.find_matching_archive = lambda destination, fingerprint: None
+            recover_cd.archive = lambda device, destination: None
+            recover_cd.attach_hfs_iso = lambda iso: (Path('/dev/disk99'), Path('/dev/disk99s2'))
+            recover_cd.extract_classic_hfs = lambda hfs, destination: (_ for _ in ()).throw(RuntimeError('unexpected layout'))
+            recover_cd.run = lambda command: None
+            recover_cd.eject_optical_disc = calls.append
+            with tempfile.TemporaryDirectory() as temporary:
+                with self.assertRaisesRegex(RuntimeError, 'unexpected layout'):
+                    recover_cd.recover_current_cd(Path(temporary), False, Path('/dev/rdisk12'))
+        finally:
+            for name, original in originals.items():
+                setattr(recover_cd, name, original)
+
+        self.assertEqual(calls, [Path('/dev/rdisk12')])
 
 
 if __name__ == "__main__":

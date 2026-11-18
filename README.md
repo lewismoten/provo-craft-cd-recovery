@@ -14,7 +14,7 @@ This repository contains **scripts only**. It does not include disc images, clip
 python3 scripts/recover_cd.py recover
 ```
 
-It detects the inserted CD-ROM drive, reads the classic-Mac HFS volume name, and writes the full result to `CD/<detected-disc-name>/`. Every major step and conversion batch is printed as it runs; raw capture also exposes `dd` progress while the CD spins. After a successful recovery, it ejects the disc. That Git-ignored folder includes the raw archive in `archive/`, root-level contact sheets and converted TTF fonts, plus `PNG/` and `SVG/` directories. Re-running it fingerprints the inserted disc, finds any matching local archive, and skips archive, image, font, SVG, and contact-sheet files that already exist.
+It detects the inserted CD-ROM drive, reads the classic-Mac HFS volume name, and writes the full result to `CD/<detected-disc-name>/`. Every major step and conversion batch is printed as it runs; raw capture also exposes `dd` progress while the CD spins. At the end of a recovery attempt—successful or not—it releases and ejects the disc. That Git-ignored folder includes the raw archive in `archive/`, root-level contact sheets and converted TTF fonts, plus `PNG/` and `SVG/` directories. Re-running it fingerprints the inserted disc, finds any matching local archive, and skips archive, image, font, SVG, and contact-sheet files that already exist.
 
 ## Why the scripts are necessary
 
@@ -72,7 +72,7 @@ The recovery set began with seven Provo Craft boxes found at an annual library b
 | Countryside Collection | 40-6070 | `CD/countryside` | Kathy Distefano Griffiths | August 1996 | 215 | 215 | `Countryside Normal.ttf` | Recovered. |
 | Four Seasons | 40-6071 | — | Kathy Distefano Griffiths | August 1996 | — | — | — | Not yet recovered. |
 | Rebecca's Winter Weather | 40-6068 | `CD/winter-weather` | Rebecca Carter | August 1996 | 216 | 216 | `Winter Weather Normal.ttf` | Recovered. |
-| Holidays | 40-6073 | — | Annette Ward | August 1996 | — | — | — | Being processed. |
+| Holidays | 40-6073 | — | Annette Ward | August 1996 | — | — | — | Blocked: legacy artwork folders need layout detection. |
 
 ## What it does
 
