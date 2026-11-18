@@ -14,6 +14,14 @@ python3 scripts/recover_cd.py recover
 
 It detects the inserted CD-ROM drive, reads the classic-Mac HFS volume name, and writes the full result to `CD/<detected-disc-name>/`. Every major step and conversion batch is printed as it runs; raw capture also exposes `dd` progress while the CD spins. After a successful recovery, it ejects the disc. That Git-ignored folder includes the raw archive in `archive/`, root-level contact sheets and converted TTF fonts, plus `PNG/` and `SVG/` directories. Re-running it fingerprints the inserted disc, finds any matching local archive, and skips archive, image, font, SVG, and contact-sheet files that already exist.
 
+## Why the scripts are necessary
+
+When this disc is inserted into a current Mac, macOS recognizes that a disk arrived but offers no readable files:
+
+![macOS alert: The disk you attached was not readable by this computer](assets/macos-unreadable-disc-warning.png)
+
+The recovery workflow captures the raw sectors before conversion, then uses HFS-aware tooling to export the artwork and legacy fonts without asking macOS to initialize, repair, or overwrite the disc.
+
 ## Original system requirements, circa 1996
 
 The discs asked for what was then a serious workstation:
