@@ -62,7 +62,7 @@ The packaging for every recovered disc lists copyright **August 1996**.
 - **Countryside Collection** — Kathy Distefano Griffiths; product no. 40-6070.
 - **Four Seasons** — Kathy Distefano Griffiths; product no. 40-6071.
 - **Creations On Computer: All Occasions** — Annette Ward; product no. 40-6072.
-- **Holidays** — Annette Ward; product no. 40-6073.
+- **Creations On Computer: Holidays** — Annette Ward; product no. 40-6073.
 
 ## Recovered CDs
 
@@ -73,7 +73,7 @@ The packaging for every recovered disc lists copyright **August 1996**.
 | Countryside Collection | 40-6070 | `countryside` | Kathy Distefano Griffiths | 215 | 215 | `Countryside Normal.ttf` |
 | Four Seasons | 40-6071 | `four-seasons` | Kathy Distefano Griffiths | 221 | 221 | `Four Seasons Normal.ttf` |
 | Creations On Computer: All Occasions | 40-6072 | `all-occasions` | Annette Ward | 202 | 202 | `ALL OCCASIONS Normal.ttf` |
-| Holidays | 40-6073 | `holidays` | Annette Ward | 199 | 198 | `Holidays Normal.ttf` |
+| Creations On Computer: Holidays | 40-6073 | `holidays` | Annette Ward | 199 | 198 | `Holidays Normal.ttf` |
 
 The following are **third-party Internet Archive listings**, included as historical discovery references only. They are not supplied or endorsed by this repository, and their availability does not grant permission to redistribute the original artwork, fonts, manuals, or disc images.
 
@@ -81,7 +81,7 @@ The following are **third-party Internet Archive listings**, included as histori
 | --- | --- | --- |
 | Rebecca's Garden Party | 40-6069 | [Internet Archive listing](https://archive.org/details/garden-party-designs-by-rebecca-carter) |
 | Creations On Computer: All Occasions | 40-6072 | [Internet Archive listing](https://archive.org/details/annettewardalloccasions) |
-| Holidays | 40-6073 | [Internet Archive listing](https://archive.org/details/annettewardholidays) |
+| Creations On Computer: Holidays | 40-6073 | [Internet Archive listing](https://archive.org/details/annettewardholidays) |
 
 Other titles will be added only when a listing can be matched to the disc title and product number.
 
