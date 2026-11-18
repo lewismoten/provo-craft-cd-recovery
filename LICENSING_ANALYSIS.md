@@ -53,6 +53,12 @@ This analysis should not overread the license. A computer connected to Wi-Fi is 
 
 But modern systems blur the boundary. Automatic backup, cloud synchronization, shared household storage, remote access, and collaboration tools can turn a local-looking folder into a network-accessible copy without much deliberate setup. That ambiguity is one reason this project keeps all recovered material in the Git-ignored `CD/` directory and keeps the public repository limited to tools and documentation.
 
+## A deliberately limited public demonstration
+
+This project considered publishing a small image that rendered each font's name in that font, along with a social-preview image showing some clip art in color or a contact-sheet-style selection of recovered artwork. The manuals' prohibition on internet transmission and distribution of the images is too restrictive for this project to treat those demonstrations as authorized merely because they would be small, recolored, cropped, presented in perspective, or otherwise derivative.
+
+This is a conservative project decision, not a legal conclusion about every possible derivative use. The public social-preview illustration in this repository is newly created repository artwork; it does not contain recovered Provo Craft clip art, contact sheets, font files, or renderings made from the recovered fonts.
+
 ## What this repository does—and does not—claim
 
 This project documents the manual language and adopts a conservative publishing boundary:
